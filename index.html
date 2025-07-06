@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Challenge Progress</title>
+    <title>Défi Fitness - 20 000 DH</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,8 +14,8 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,22 +24,57 @@
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 500px;
-            width: 90%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            max-width: 550px;
+            width: 95%;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 15px,
+                rgba(255, 215, 0, 0.02) 15px,
+                rgba(255, 215, 0, 0.02) 30px
+            );
+            animation: shimmer 4s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         h1 {
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: bold;
+            margin-bottom: 25px;
+            font-size: 2.3em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ffd700, #ffed4a, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: title-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes title-glow {
+            from { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+            to { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)); }
         }
 
         .progress-circle {
@@ -49,18 +86,24 @@
 
         .circle-bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.2);
+            stroke: rgba(255, 255, 255, 0.1);
             stroke-width: 12;
         }
 
         .circle-progress {
             fill: none;
-            stroke: #00ff88;
+            stroke: url(#goldGradient);
             stroke-width: 12;
             stroke-linecap: round;
             transform: rotate(-90deg);
             transform-origin: center;
-            filter: drop-shadow(0 0 10px #00ff88);
+            filter: drop-shadow(0 0 15px #ffd700);
+            animation: pulse-circle 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-circle {
+            0%, 100% { stroke-width: 12; }
+            50% { stroke-width: 16; }
         }
 
         .percentage {
@@ -70,34 +113,95 @@
             transform: translate(-50%, -50%);
             font-size: 2.5em;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            animation: percentage-bounce 2s infinite;
+        }
+
+        @keyframes percentage-bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) scale(1); }
+            40% { transform: translate(-50%, -50%) scale(1.15); }
+            60% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        .competition-info {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 107, 107, 0.15));
+            padding: 25px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            position: relative;
+        }
+
+        .prize-amount {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            margin-bottom: 15px;
+            animation: money-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes money-pulse {
+            0%, 100% { transform: scale(1); color: #ffd700; }
+            50% { transform: scale(1.1); color: #ffed4a; }
+        }
+
+        .competitors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .competitor {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: 600;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .competitor:hover {
+            background: rgba(255, 215, 0, 0.25);
+            transform: scale(1.05);
+            border-color: #ffd700;
         }
 
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin: 25px 0;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             padding: 20px;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
         }
 
         .stat-number {
-            font-size: 2em;
+            font-size: 2.2em;
             font-weight: bold;
-            color: #00ff88;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         .stat-label {
-            font-size: 0.9em;
-            margin-top: 5px;
-            opacity: 0.8;
+            font-size: 1em;
+            margin-top: 8px;
+            opacity: 0.9;
+            font-weight: 600;
         }
 
         .milestones {
@@ -108,97 +212,204 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 15px 20px;
             margin: 10px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .milestone:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateX(10px);
         }
 
         .milestone.completed {
-            background: rgba(0, 255, 136, 0.2);
-            border-color: #00ff88;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(0, 255, 136, 0.3));
+            border-color: #ffd700;
+            animation: milestone-celebration 2s ease-in-out infinite;
+        }
+
+        @keyframes milestone-celebration {
+            0%, 100% { 
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+                transform: scale(1.02);
+            }
         }
 
         .milestone-check {
-            font-size: 1.2em;
-            color: #00ff88;
+            font-size: 1.8em;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        .motivation {
+            margin: 25px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            background: rgba(255, 215, 0, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            animation: motivation-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes motivation-glow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            }
+            50% { 
+                transform: scale(1.02);
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+            }
         }
 
         .update-time {
             margin-top: 20px;
             font-size: 0.9em;
+            opacity: 0.8;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .fire-effects {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2em;
+            animation: fire-dance 1.5s ease-in-out infinite alternate;
+        }
+
+        .fire-effects-left {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 2em;
+            animation: fire-dance 1.5s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes fire-dance {
+            0% { transform: scale(1) rotate(-10deg); }
+            100% { transform: scale(1.3) rotate(10deg); }
+        }
+
+        .trophy-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .trophy {
+            position: absolute;
+            font-size: 1.5em;
+            animation: trophy-fall 4s linear infinite;
             opacity: 0.7;
         }
 
-        .motivation {
-            margin-top: 20px;
-            font-size: 1.1em;
-            font-style: italic;
-            color: #00ff88;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .percentage {
-            animation: pulse 2s infinite;
+        @keyframes trophy-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(600px) rotate(360deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏋️‍♂️ FITNESS CHALLENGE</h1>
+        <div class="fire-effects">🔥</div>
+        <div class="fire-effects-left">💪</div>
+        <div class="trophy-rain">
+            <div class="trophy" style="left: 10%; animation-delay: 0s;">🏆</div>
+            <div class="trophy" style="left: 30%; animation-delay: 1s;">💎</div>
+            <div class="trophy" style="left: 50%; animation-delay: 2s;">🏆</div>
+            <div class="trophy" style="left: 70%; animation-delay: 3s;">💎</div>
+            <div class="trophy" style="left: 90%; animation-delay: 0.5s;">🏆</div>
+        </div>
+        
+        <h1>🏋️‍♂️ DÉFI FITNESS SQUAD</h1>
         
         <div class="progress-circle">
             <svg width="200" height="200">
+                <defs>
+                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#ffed4a;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
                 <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
                 <circle class="circle-progress" cx="100" cy="100" r="90" id="progressCircle"></circle>
             </svg>
             <div class="percentage" id="percentage">0%</div>
         </div>
 
+        <div class="competition-info">
+            <h3 style="margin-bottom: 15px; color: #ffd700; font-size: 1.3em;">💰 LA BATAILLE FINALE</h3>
+            <div class="prize-amount">20 000 DH</div>
+            <div style="color: #ffed4a; font-weight: 600; margin-bottom: 20px; font-size: 1.2em;">Winner takes all, khoya!</div>
+            
+            <div class="competitors">
+                <div class="competitor">🔥 MEHDI</div>
+                <div class="competitor">💪 ANASSE</div>
+                <div class="competitor">⚡ BENGRAM</div>
+                <div class="competitor">🚀 IMAD</div>
+            </div>
+        </div>
+
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-number" id="daysCompleted">0</div>
-                <div class="stat-label">Days Completed</div>
+                <div class="stat-label">Jours Écoulés</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="daysRemaining">365</div>
-                <div class="stat-label">Days Remaining</div>
+                <div class="stat-label">Jours Restants</div>
             </div>
         </div>
 
         <div class="milestones">
-            <h3 style="margin-bottom: 15px;">🎯 Milestones</h3>
+            <h3 style="margin-bottom: 20px; color: #ffd700; font-size: 1.3em;">🎯 CHECKPOINTS</h3>
             <div class="milestone" id="milestone25">
-                <span>25% Complete</span>
+                <span>25% - Premier Palier</span>
                 <span class="milestone-check">⭐</span>
             </div>
             <div class="milestone" id="milestone50">
-                <span>50% Complete</span>
+                <span>50% - Mi-Parcours</span>
                 <span class="milestone-check">🔥</span>
             </div>
             <div class="milestone" id="milestone75">
-                <span>75% Complete</span>
+                <span>75% - Sprint Final</span>
                 <span class="milestone-check">💪</span>
             </div>
             <div class="milestone" id="milestone90">
-                <span>90% Complete</span>
+                <span>90% - Ligne d'Arrivée</span>
                 <span class="milestone-check">🚀</span>
             </div>
         </div>
 
         <div class="motivation" id="motivationText">
-            Every day is progress! 💪
+            Wllah on va tous crush ce défi! 💪
         </div>
 
         <div class="update-time" id="updateTime">
-            Last updated: Loading...
+            Dernière mise à jour: Chargement...
         </div>
     </div>
 
@@ -236,7 +447,7 @@
 
             // Update time
             document.getElementById('updateTime').textContent = 
-                `Last updated: ${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+                `Dernière mise à jour: ${currentDate.toLocaleDateString('fr-FR')} ${currentDate.toLocaleTimeString('fr-FR')}`;
         }
 
         function updateMilestone(id, completed) {
@@ -253,25 +464,25 @@
             let message = '';
 
             if (percentage < 5) {
-                message = "Just started - the journey begins! 🚀";
+                message = "C'est parti les gars! 20K on arrive! 🚀💰";
             } else if (percentage < 15) {
-                message = "Building momentum! 💪";
+                message = "On build la force sah! Continuez! 💪";
             } else if (percentage < 25) {
-                message = "Getting into the groove! 🔥";
+                message = "Bezef motivation! On lâche rien! 🔥";
             } else if (percentage < 40) {
-                message = "Quarter way there! Keep pushing! ⚡";
+                message = "25% fait! 20K de plus en plus proche! ⚡";
             } else if (percentage < 50) {
-                message = "Almost halfway - you're crushing it! 💯";
+                message = "Mi-chemin walah! Qui va gagner? 💯";
             } else if (percentage < 65) {
-                message = "More than halfway - unstoppable! 🏆";
+                message = "Plus que la moitié! Les 20K arrivent! 🏆";
             } else if (percentage < 75) {
-                message = "Final stretch approaching! 🎯";
+                message = "Dernière ligne droite! Donnez tout! 🎯";
             } else if (percentage < 85) {
-                message = "Three quarters done - legendary! 👑";
+                message = "Presque fini! Le champion arrive! 👑";
             } else if (percentage < 95) {
-                message = "Almost there - finish strong! 🔥";
+                message = "Derniers jours! 20K à portée! 🔥";
             } else {
-                message = "Final days - you're a champion! 🏅";
+                message = "TERMINÉ! Un champion a gagné 20 000 DH! 🏅💰";
             }
 
             motivationText.textContent = message;
@@ -279,7 +490,7 @@
 
         // Update immediately and then every hour
         updateProgress();
-        setInterval(updateProgress, 3600000); // Update every hour
+        setInterval(updateProgress, 3600000);
     </script>
 </body>
 </html>
