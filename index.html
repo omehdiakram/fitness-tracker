@@ -1,17 +1,38 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Squad Battle - 20K DH</title>
+    <title>FitSquad Pro - 20K DH Challenge</title>
     
-    <!-- Firebase CDN -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.2s ease-in-out;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -20,179 +41,209 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Authentication Styles */
+        .auth-container {
             min-height: 100vh;
-            color: #1e293b;
-            padding: 10px;
-        }
-
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Login Styles */
-        .login-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
         }
 
-        .login-card {
-            background: white;
+        .auth-card {
+            background: var(--surface-color);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
+            box-shadow: var(--shadow-lg);
             width: 100%;
+            max-width: 400px;
+            text-align: center;
         }
 
-        .login-title {
-            font-size: 2rem;
+        .auth-logo {
+            font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
         }
 
-        .login-subtitle {
-            color: #64748b;
+        .auth-subtitle {
+            color: var(--text-secondary);
             margin-bottom: 30px;
         }
 
-        .profile-selection {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .form-group {
             margin-bottom: 20px;
+            text-align: left;
         }
 
-        .profile-option {
-            padding: 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: white;
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
         }
 
-        .profile-option:hover {
-            border-color: #3b82f6;
-            transform: translateY(-2px);
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: var(--transition);
         }
 
-        .profile-option.selected {
-            border-color: #3b82f6;
-            background: #eff6ff;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .profile-avatar-login {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #3b82f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        .btn {
+            background: var(--primary-color);
             color: white;
-            margin: 0 auto 10px;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .auth-divider {
+            margin: 24px 0;
+            text-align: center;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .auth-divider span {
+            background: var(--surface-color);
+            padding: 0 16px;
+        }
+
+        /* Main App Styles */
+        .app-container {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         .header {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            text-align: center;
-            position: relative;
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .user-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .header-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .user-menu {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .current-user-avatar {
+        .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #3b82f6;
+            background: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
-        }
-
-        .logout-btn {
-            padding: 8px 15px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .main-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-
-        .prize-banner {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: inline-block;
-            margin-top: 10px;
+            font-weight: 600;
         }
 
         .nav-tabs {
             display: flex;
-            background: white;
-            border-radius: 15px;
+            background: var(--surface-color);
+            border-radius: var(--radius);
             padding: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
             overflow-x: auto;
         }
 
         .nav-tab {
             padding: 12px 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             border: none;
             background: transparent;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: var(--transition);
             white-space: nowrap;
-            transition: all 0.3s ease;
             flex: 1;
         }
 
         .nav-tab.active {
-            background: #3b82f6;
+            background: var(--primary-color);
             color: white;
         }
 
         .nav-tab:hover:not(.active) {
-            background: #f1f5f9;
+            background: var(--background-color);
+            color: var(--text-primary);
         }
 
         .tab-content {
@@ -205,939 +256,466 @@
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
             margin-bottom: 20px;
         }
 
-        .progress-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .progress-circle {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 20px;
-        }
-
-        .circle-bg {
-            fill: none;
-            stroke: #f1f5f9;
-            stroke-width: 8;
-        }
-
-        .circle-progress {
-            fill: none;
-            stroke: #3b82f6;
-            stroke-width: 8;
-            stroke-linecap: round;
-            transform: rotate(-90deg);
-            transform-origin: center;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-
-        .percentage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.8rem;
+        .metric-value {
+            font-size: 2.5rem;
             font-weight: 700;
-            color: #3b82f6;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            transition: width 0.5s ease;
         }
 
         .leaderboard {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
         }
 
-        .leaderboard-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .player-card {
+        .leaderboard-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px;
-            margin: 10px 0;
-            border-radius: 15px;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            padding: 16px;
+            margin: 8px 0;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
         }
 
-        .player-card:hover {
-            border-color: #3b82f6;
+        .leaderboard-item:hover {
+            border-color: var(--primary-color);
             transform: translateY(-2px);
         }
 
-        .player-card.rank-1 {
+        .leaderboard-item.rank-1 {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: white;
             border-color: #d97706;
         }
 
-        .player-card.rank-2 {
+        .leaderboard-item.rank-2 {
             background: linear-gradient(135deg, #e5e7eb, #9ca3af);
             color: white;
             border-color: #6b7280;
         }
 
-        .player-card.rank-3 {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+        .leaderboard-item.rank-3 {
+            background: linear-gradient(135deg, #cd7c2f, #b45309);
             color: white;
-            border-color: #b45309;
+            border-color: #92400e;
         }
 
-        .player-info {
+        .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .player-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #3b82f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .player-stats {
+        .user-stats {
             text-align: right;
         }
 
-        .player-score {
+        .user-score {
             font-size: 1.5rem;
             font-weight: 700;
         }
 
-        .player-streak {
-            font-size: 0.9rem;
+        .user-streak {
+            font-size: 0.875rem;
             opacity: 0.8;
         }
 
-        .profile-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .profile-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #3b82f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            margin: 0 auto 15px;
-        }
-
-        .progress-tracker {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .tracker-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .metric-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #3b82f6;
-        }
-
-        .metric-label {
-            font-size: 0.9rem;
-            color: #64748b;
-            margin-top: 5px;
-        }
-
-        .check-in-section {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .check-in-buttons {
+        .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            gap: 12px;
             margin-top: 20px;
         }
 
-        .check-in-btn {
-            padding: 15px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            background: white;
+        .action-btn {
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--surface-color);
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-weight: 500;
+            transition: var(--transition);
             text-align: center;
         }
 
-        .check-in-btn:hover {
-            border-color: #3b82f6;
+        .action-btn:hover {
+            border-color: var(--primary-color);
             background: #eff6ff;
         }
 
-        .check-in-btn.checked {
-            background: #10b981;
-            border-color: #10b981;
+        .action-btn.active {
+            background: var(--success-color);
+            border-color: var(--success-color);
             color: white;
         }
 
-        .achievements-grid {
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--success-color);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+
+        .notification.error {
+            border-left-color: var(--error-color);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .firebase-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 1000;
+            background: var(--success-color);
+            color: white;
+        }
+
+        .firebase-status.offline {
+            background: var(--error-color);
+        }
+
+        .analytics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-top: 20px;
+            margin-top: 24px;
         }
 
-        .achievement-card {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .achievement-card.unlocked {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            border-color: #10b981;
-        }
-
-        .achievement-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        .social-feed {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .post {
-            border-bottom: 1px solid #e2e8f0;
-            padding: 20px 0;
-        }
-
-        .post:last-child {
-            border-bottom: none;
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .post-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #3b82f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .ai-insights {
-            background: linear-gradient(135deg, #eff6ff, #dbeafe);
-            border: 2px solid #3b82f6;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .ai-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 15px;
-        }
-
-        .challenge-card {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border: 2px solid #f59e0b;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 10px 0;
-        }
-
-        .challenge-title {
-            font-weight: 700;
-            color: #92400e;
-            margin-bottom: 10px;
-        }
-
-        .input-group {
-            margin: 15px 0;
-        }
-
-        .input-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #374151;
-        }
-
-        .input-group input,
-        .input-group select,
-        .input-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus,
-        .input-group textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .streak-indicator {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .streak-day {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .streak-day.completed {
-            background: #10b981;
-            color: white;
-        }
-
-        .photo-upload {
-            border: 2px dashed #d1d5db;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .photo-upload:hover {
-            border-color: #3b82f6;
-            background: #f8fafc;
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .photo-item {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #f3f4f6;
-        }
-
-        .motivation-quote {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            font-style: italic;
-            font-weight: 500;
-            color: #92400e;
+        .chart-container {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            min-height: 300px;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .firebase-status {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            z-index: 1000;
-        }
-
-        .data-management {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-
-        .data-btn {
-            display: block;
-            margin: 5px 0;
-            padding: 8px 12px;
-            background: #374151;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-
-        .data-btn:hover {
-            opacity: 1;
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         @media (max-width: 768px) {
-            .dashboard-grid,
-            .profile-section {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
-            .nav-tabs {
-                overflow-x: auto;
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
             }
             
-            .tracker-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .profile-selection {
-                grid-template-columns: 1fr;
+            .header-stats {
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="login-container">
-        <div class="login-card">
-            <h1 class="login-title">🏆 SQUAD BATTLE</h1>
-            <p class="login-subtitle">Sélectionnez votre profil pour continuer</p>
+    <!-- Firebase Connection Status -->
+    <div id="firebaseStatus" class="firebase-status">
+        <span id="statusText">Connecting...</span>
+    </div>
+
+    <!-- Authentication Screen -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-logo">FitSquad Pro</h1>
+            <p class="auth-subtitle">Join the 20K DH Challenge</p>
             
-            <div class="profile-selection">
-                <div class="profile-option" onclick="selectProfile('mehdi')">
-                    <div class="profile-avatar-login">🔥</div>
-                    <h3>MEHDI</h3>
-                    <p>The Beast</p>
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn" onclick="loginUser()">Sign In</button>
+                <button class="btn btn-secondary" onclick="showRegisterForm()">Create Account</button>
+                
+                <div class="auth-divider">
+                    <span>or</span>
                 </div>
                 
-                <div class="profile-option" onclick="selectProfile('anasse')">
-                    <div class="profile-avatar-login">💪</div>
-                    <h3>ANASSE</h3>
-                    <p>The Machine</p>
-                </div>
-                
-                <div class="profile-option" onclick="selectProfile('bengram')">
-                    <div class="profile-avatar-login">⚡</div>
-                    <h3>BENGRAM</h3>
-                    <p>The Lightning</p>
-                </div>
-                
-                <div class="profile-option" onclick="selectProfile('imad')">
-                    <div class="profile-avatar-login">🚀</div>
-                    <h3>IMAD</h3>
-                    <p>The Rocket</p>
-                </div>
+                <button class="btn btn-secondary" onclick="signInWithGoogle()">
+                    Sign in with Google
+                </button>
             </div>
             
-            <button id="loginBtn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" disabled onclick="login()">
-                Entrer dans la bataille
-            </button>
+            <!-- Register Form -->
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="registerName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="registerPassword" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Squad Nickname</label>
+                    <input type="text" class="form-input" id="registerNickname" placeholder="e.g., The Beast, The Machine">
+                </div>
+                <button class="btn" onclick="registerUser()">Create Account</button>
+                <button class="btn btn-secondary" onclick="showLoginForm()">Back to Sign In</button>
+            </div>
         </div>
     </div>
 
-    <!-- MAIN APP -->
-    <div id="mainApp" class="app-container hidden">
+    <!-- Main Application -->
+    <div id="mainApp" class="app-container">
         <div class="header">
-            <div class="user-info">
-                <div class="current-user-avatar" id="currentUserAvatar">🔥</div>
-                <span id="currentUserName">MEHDI</span>
-                <button class="logout-btn" onclick="logout()">Déconnexion</button>
+            <div class="header-content">
+                <h1>FitSquad Pro Challenge</h1>
+                <div class="header-stats">
+                    <span>💰 Prize: 20,000 DH</span>
+                    <span id="globalProgress">Progress: 9.6%</span>
+                    <span id="daysRemaining">Days left: 330</span>
+                    <span id="currentLeader">Leader: Loading...</span>
+                </div>
             </div>
-            
-            <h1 class="main-title">🏆 ULTIMATE SQUAD BATTLE</h1>
-            <div class="prize-banner">💰 20,000 DH WINNER TAKES ALL</div>
-            <div style="margin-top: 15px; color: #64748b;">
-                <span id="globalProgress">9.6%</span> Complete • 
-                <span id="daysRemaining">330</span> days left • 
-                <span id="currentLeader">Mehdi</span> leading
+            <div class="user-menu">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">User</span>
+                <button class="btn" onclick="signOut()" style="width: auto; padding: 8px 16px;">Sign Out</button>
             </div>
         </div>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('dashboard')">🏠 Dashboard</button>
-            <button class="nav-tab" onclick="showTab('profiles')">👥 Profiles</button>
-            <button class="nav-tab" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
-            <button class="nav-tab" onclick="showTab('challenges')">⚡ Challenges</button>
-            <button class="nav-tab" onclick="showTab('social')">💬 Social</button>
-            <button class="nav-tab" onclick="showTab('ai')">🤖 AI Coach</button>
+            <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+            <button class="nav-tab" onclick="showTab('progress')">Progress</button>
+            <button class="nav-tab" onclick="showTab('leaderboard')">Leaderboard</button>
+            <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+            <button class="nav-tab" onclick="showTab('social')">Feed</button>
         </div>
 
-        <!-- DASHBOARD TAB -->
+        <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
             <div class="dashboard-grid">
-                <div class="progress-card">
-                    <h3>Global Progress</h3>
-                    <div class="progress-circle">
-                        <svg width="150" height="150">
-                            <circle class="circle-bg" cx="75" cy="75" r="65"></circle>
-                            <circle class="circle-progress" cx="75" cy="75" r="65" id="globalProgressCircle"></circle>
-                        </svg>
-                        <div class="percentage" id="globalPercentage">9.6%</div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Your Progress</h3>
                     </div>
-                    <p><strong>35</strong> days completed</p>
-                </div>
-
-                <div class="progress-card">
-                    <h3>Quick Check-In</h3>
-                    <div class="check-in-buttons">
-                        <button class="check-in-btn" onclick="quickCheckIn('workout')">
-                            💪 Workout Done
-                        </button>
-                        <button class="check-in-btn" onclick="quickCheckIn('nutrition')">
-                            🥗 Good Nutrition
-                        </button>
-                        <button class="check-in-btn" onclick="quickCheckIn('sleep')">
-                            😴 Good Sleep
-                        </button>
+                    <div class="metric-value" id="userScore">0</div>
+                    <div class="metric-label">Total Points</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="userProgressBar" style="width: 0%"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--text-secondary);">
+                        <span>Current Streak: <span id="userStreak">0</span> days</span>
+                        <span>Rank: #<span id="userRank">-</span></span>
                     </div>
                 </div>
-            </div>
 
-            <div class="motivation-quote" id="dailyMotivation">
-                "Today, you choose between 'I wish' and 'I will' - Choose wisely! 💪"
-            </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Check-in</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <div class="action-btn" onclick="quickCheckIn('workout')">
+                            💪 Workout
+                        </div>
+                        <div class="action-btn" onclick="quickCheckIn('nutrition')">
+                            🥗 Nutrition
+                        </div>
+                        <div class="action-btn" onclick="quickCheckIn('sleep')">
+                            😴 Sleep
+                        </div>
+                        <div class="action-btn" onclick="quickCheckIn('hydration')">
+                            💧 Hydration
+                        </div>
+                    </div>
+                </div>
 
-            <div class="progress-tracker">
-                <h3>Today's Team Stats</h3>
-                <div class="tracker-grid">
-                    <div class="metric-card">
-                        <div class="metric-value" id="workoutsCompleted">3/4</div>
-                        <div class="metric-label">Workouts Completed</div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Team Stats</h3>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-value" id="dietOnTrack">2/4</div>
-                        <div class="metric-label">Diet on Track</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" id="averageScore">67</div>
-                        <div class="metric-label">Average Score</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value" id="teamStreak">12</div>
-                        <div class="metric-label">Team Streak</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <div class="metric-value" id="teamAverage">0</div>
+                            <div class="metric-label">Team Average</div>
+                        </div>
+                        <div>
+                            <div class="metric-value" id="teamActive">0</div>
+                            <div class="metric-label">Active Today</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- PROFILES TAB -->
-        <div id="profiles" class="tab-content">
-            <div class="profile-section">
-                <div class="profile-card" onclick="switchToProfile('mehdi')">
-                    <div class="profile-avatar">🔥</div>
-                    <h3>MEHDI</h3>
-                    <p><strong>Score:</strong> <span id="mehdi-score">85</span>/100</p>
-                    <p><strong>Streak:</strong> <span id="mehdi-streak">12</span> days</p>
-                    <div class="streak-indicator">
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day">•</div>
-                        <div class="streak-day">•</div>
+        <!-- Progress Tab -->
+        <div id="progress" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Log Your Progress</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Weight (kg)</label>
+                        <input type="number" class="form-input" id="weightInput" placeholder="Enter weight" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Body Fat %</label>
+                        <input type="number" class="form-input" id="bodyfatInput" placeholder="Enter body fat %" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Energy Level (1-10)</label>
+                        <input type="number" class="form-input" id="energyInput" placeholder="Rate your energy" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sleep Hours</label>
+                        <input type="number" class="form-input" id="sleepInput" placeholder="Hours slept" step="0.5">
                     </div>
                 </div>
-
-                <div class="profile-card" onclick="switchToProfile('anasse')">
-                    <div class="profile-avatar">💪</div>
-                    <h3>ANASSE</h3>
-                    <p><strong>Score:</strong> <span id="anasse-score">78</span>/100</p>
-                    <p><strong>Streak:</strong> <span id="anasse-streak">8</span> days</p>
-                    <div class="streak-indicator">
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day">✗</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day">•</div>
-                    </div>
-                </div>
-
-                <div class="profile-card" onclick="switchToProfile('bengram')">
-                    <div class="profile-avatar">⚡</div>
-                    <h3>BENGRAM</h3>
-                    <p><strong>Score:</strong> <span id="bengram-score">72</span>/100</p>
-                    <p><strong>Streak:</strong> <span id="bengram-streak">5</span> days</p>
-                    <div class="streak-indicator">
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day">✗</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day">•</div>
-                    </div>
-                </div>
-
-                <div class="profile-card" onclick="switchToProfile('imad')">
-                    <div class="profile-avatar">🚀</div>
-                    <h3>IMAD</h3>
-                    <p><strong>Score:</strong> <span id="imad-score">81</span>/100</p>
-                    <p><strong>Streak:</strong> <span id="imad-streak">10</span> days</p>
-                    <div class="streak-indicator">
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day completed">✓</div>
-                        <div class="streak-day">•</div>
-                    </div>
-                </div>
+                <button class="btn" onclick="saveProgress()" style="margin-top: 16px;">Save Progress</button>
             </div>
 
-            <!-- Individual Profile Details -->
-            <div class="progress-tracker">
-                <h3>📊 Detailed Tracking</h3>
-                <div class="input-group">
-                    <label>Today's Weight (kg)</label>
-                    <input type="number" id="weightInput" placeholder="Enter your weight">
+            <div class="analytics-grid">
+                <div class="chart-container">
+                    <h4>Weight Trend</h4>
+                    <canvas id="weightChart" width="400" height="200"></canvas>
                 </div>
-                <div class="input-group">
-                    <label>Body Fat % (optional)</label>
-                    <input type="number" id="bodyfatInput" placeholder="Enter body fat %">
-                </div>
-                <div class="input-group">
-                    <label>Energy Level (1-10)</label>
-                    <select id="energyInput">
-                        <option value="">Select energy level</option>
-                        <option value="1">1 - Exhausted</option>
-                        <option value="5">5 - Average</option>
-                        <option value="10">10 - Beast Mode</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary" onclick="saveProgress()">Save Progress</button>
-            </div>
-
-            <!-- Photo Progress -->
-            <div class="progress-tracker">
-                <h3>📸 Photo Progress</h3>
-                <div class="photo-upload" onclick="uploadPhoto()">
-                    <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
-                    <p>Click to upload progress photo</p>
-                    <p style="font-size: 0.9rem; color: #6b7280;">Before/After, gym selfies, meals, etc.</p>
-                </div>
-                <div class="photo-grid" id="photoGrid">
-                    <!-- Photos will be added here -->
+                <div class="chart-container">
+                    <h4>Daily Score</h4>
+                    <canvas id="scoreChart" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- LEADERBOARD TAB -->
+        <!-- Leaderboard Tab -->
         <div id="leaderboard" class="tab-content">
             <div class="leaderboard">
-                <h2 class="leaderboard-title">🏆 Live Rankings</h2>
+                <h2 class="card-title" style="text-align: center; margin-bottom: 24px;">Live Rankings</h2>
                 <div id="leaderboardContainer">
-                    <!-- Leaderboard will be populated here -->
+                    <!-- Leaderboard items will be populated here -->
                 </div>
             </div>
+        </div>
 
-            <!-- Achievements -->
-            <div class="progress-tracker">
-                <h3>🏅 Squad Achievements</h3>
-                <div class="achievements-grid">
-                    <div class="achievement-card unlocked">
-                        <div class="achievement-icon">🔥</div>
-                        <h4>First Week Warriors</h4>
-                        <p>Complete first 7 days</p>
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">Performance Metrics</h3>
+                    <div id="performanceMetrics">
+                        <!-- Metrics will be populated here -->
                     </div>
-                    <div class="achievement-card unlocked">
-                        <div class="achievement-icon">💪</div>
-                        <h4>Team Spirit</h4>
-                        <p>All 4 members active same day</p>
-                    </div>
-                    <div class="achievement-card">
-                        <div class="achievement-icon">⭐</div>
-                        <h4>25% Milestone</h4>
-                        <p>Reach 25% (17 Sept)</p>
-                    </div>
-                    <div class="achievement-card">
-                        <div class="achievement-icon">🚀</div>
-                        <h4>No Excuses</h4>
-                        <p>30-day team streak</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Consistency Score</h3>
+                    <div class="metric-value" id="consistencyScore">0%</div>
+                    <div class="metric-label">Based on daily check-ins</div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Predictions</h3>
+                    <div id="predictions">
+                        <p>AI analysis based on your progress patterns...</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CHALLENGES TAB -->
-        <div id="challenges" class="tab-content">
-            <div class="progress-tracker">
-                <h3>⚡ Active Challenges</h3>
-                
-                <div class="challenge-card">
-                    <div class="challenge-title">💪 Weekly Workout Challenge</div>
-                    <p>Who can complete the most workouts this week?</p>
-                    <div style="margin: 15px 0;">
-                        <strong>Current Leader:</strong> Mehdi (5/7 workouts)
-                    </div>
-                    <div style="font-size: 0.9rem; color: #6b7280;">Ends: Sunday 11:59 PM</div>
-                </div>
-
-                <div class="challenge-card">
-                    <div class="challenge-title">🥗 Nutrition Consistency</div>
-                    <p>Stay on track with your diet for 7 consecutive days</p>
-                    <div style="margin: 15px 0;">
-                        <strong>Progress:</strong> 3/7 days completed
-                    </div>
-                    <div style="font-size: 0.9rem; color: #6b7280;">Reward: Bonus 50 XP</div>
-                </div>
-
-                <div class="challenge-card">
-                    <div class="challenge-title">📸 Progress Photo Challenge</div>
-                    <p>Upload your best transformation photo this month</p>
-                    <div style="margin: 15px 0;">
-                        <strong>Participants:</strong> 2/4 submitted
-                    </div>
-                    <button class="btn btn-primary" onclick="uploadChallengePhoto()">Submit Photo</button>
-                </div>
-            </div>
-
-            <div class="progress-tracker">
-                <h3>🎯 Create New Challenge</h3>
-                <div class="input-group">
-                    <label>Challenge Title</label>
-                    <input type="text" id="challengeTitle" placeholder="e.g. 10K Steps Daily Challenge">
-                </div>
-                <div class="input-group">
-                    <label>Description</label>
-                    <textarea id="challengeDesc" rows="3" placeholder="Describe the challenge..."></textarea>
-                </div>
-                <div class="input-group">
-                    <label>Duration</label>
-                    <select id="challengeDuration">
-                        <option>1 Week</option>
-                        <option>2 Weeks</option>
-                        <option>1 Month</option>
-                    </select>
-                </div>
-                <button class="btn btn-success" onclick="createChallenge()">Create Challenge</button>
-            </div>
-        </div>
-
-        <!-- SOCIAL TAB -->
+        <!-- Social Tab -->
         <div id="social" class="tab-content">
-            <div class="social-feed">
-                <h3>💬 Squad Feed</h3>
+            <div class="card">
+                <h3 class="card-title">Team Feed</h3>
+                <div class="form-group">
+                    <textarea class="form-input" id="postInput" rows="3" placeholder="Share your progress, motivation, or achievements..."></textarea>
+                </div>
+                <button class="btn" onclick="createPost()">Share Update</button>
                 
-                <!-- Post Input -->
-                <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;">
-                    <div class="input-group">
-                        <textarea id="postInput" rows="3" placeholder="Share your progress, motivation, or struggles..."></textarea>
-                    </div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn btn-primary" onclick="createPost()">📝 Post</button>
-                        <button class="btn" onclick="addPhoto()" style="background: #10b981; color: white;">📷 Photo</button>
-                        <button class="btn" onclick="shareWorkout()" style="background: #f59e0b; color: white;">💪 Workout</button>
-                    </div>
-                </div>
-
-                <!-- Posts Container -->
-                <div id="postsContainer">
-                    <!-- Posts will be populated from Firebase -->
-                </div>
-            </div>
-
-            <!-- Accountability Section -->
-            <div class="progress-tracker">
-                <h3>🎯 Accountability Check</h3>
-                <p style="margin-bottom: 20px;">Call out your squad members (friendly pressure!)</p>
-                
-                <div id="accountabilityContainer">
-                    <!-- Will be populated based on user activity -->
-                </div>
-            </div>
-        </div>
-
-        <!-- AI COACH TAB -->
-        <div id="ai" class="tab-content">
-            <div class="ai-insights">
-                <div class="ai-title">
-                    🤖 AI Coach Analysis
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <h4>📊 Performance Analysis</h4>
-                    <p style="margin: 10px 0;">Based on your squad data, here's what I see:</p>
-                    <div id="aiAnalysis">
-                        <p>Loading analysis...</p>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <h4>🎯 Weekly Predictions</h4>
-                    <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 10px;">
-                        <p><strong>Win Probability (Based on current trends):</strong></p>
-                        <div id="winProbability" style="margin: 10px 0;">
-                            Loading predictions...
-                        </div>
-                        <p style="font-size: 0.9rem; color: #6b7280;">*Predictions based on consistency, progress rate, and momentum</p>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <h4>💡 Smart Recommendations</h4>
-                    <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 10px;">
-                        <p><strong>This Week's Focus:</strong></p>
-                        <ul style="margin-left: 20px; line-height: 1.6;">
-                            <li>Add 15min cardio after weights (all squad)</li>
-                            <li>Increase protein to 2g per kg bodyweight</li>
-                            <li>Track sleep quality for better recovery</li>
-                            <li>Weekly progress photos for motivation</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Chat -->
-            <div class="progress-tracker">
-                <h3>💬 Chat with AI Coach</h3>
-                <div id="chatMessages" style="height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; background: #f8fafc; margin-bottom: 15px;">
-                    <div style="margin-bottom: 15px;">
-                        <strong>AI Coach:</strong> Hey squad! How can I help you optimize your training today? Ask me about nutrition, workouts, or motivation strategies! 🤖💪
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="chatInput" placeholder="Ask me anything about fitness, nutrition, or motivation..." style="flex: 1; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
-                    <button class="btn btn-primary" onclick="sendAIMessage()">Send</button>
-                </div>
-                
-                <!-- Quick Questions -->
-                <div style="margin-top: 15px;">
-                    <p style="font-weight: 600; margin-bottom: 10px;">Quick Questions:</p>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                        <button class="btn" onclick="askAI('How can I break my plateau?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Break Plateau?</button>
-                        <button class="btn" onclick="askAI('Best post-workout meal?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Post-workout meal?</button>
-                        <button class="btn" onclick="askAI('How to stay motivated?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Stay motivated?</button>
-                        <button class="btn" onclick="askAI('Optimal rest time?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Rest between sets?</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Weekly Challenges from AI -->
-            <div class="progress-tracker">
-                <h3>🎯 AI-Generated Challenges</h3>
-                <div class="challenge-card">
-                    <div class="challenge-title">🧠 Smart Challenge: Plateau Breaker</div>
-                    <p>AI detected potential plateau. Try this new approach:</p>
-                    <ul style="margin: 10px 0 10px 20px;">
-                        <li>Increase reps by 2 for all exercises</li>
-                        <li>Add 5min HIIT after each workout</li>
-                        <li>Track energy levels for 7 days</li>
-                    </ul>
-                    <button class="btn btn-primary" onclick="acceptAIChallenge()">Accept Challenge</button>
+                <div id="feedContainer" style="margin-top: 24px;">
+                    <!-- Feed posts will be populated here -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Firebase Configuration - Updated with your actual config
+        // Firebase Configuration - Your actual config
         const firebaseConfig = {
             apiKey: "AIzaSyBYXcm6oJNsTLnRyLB8hv7tmOCX6QOFTyw",
             authDomain: "fitness-tracker-eff06.firebaseapp.com",
@@ -1150,446 +728,730 @@
         };
 
         // Initialize Firebase
-        let isFirebaseConnected = false;
-        let database = null;
-        let firebaseListeners = [];
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            isFirebaseConnected = true;
-            console.log('🔥 Firebase connected successfully!');
-        } catch (error) {
-            console.warn('⚠️ Firebase not configured properly:', error);
-            isFirebaseConnected = false;
-        }
-
-        // Global data storage
-        let squadData = {
-            mehdi: { 
-                name: 'MEHDI', 
-                nickname: 'The Beast', 
-                emoji: '🔥', 
-                score: 85, 
-                streak: 12, 
-                workouts: [], 
-                weight: [], 
-                photos: [], 
-                checkIns: {},
-                lastActive: new Date().toISOString(),
-                isOnline: false
-            },
-            anasse: { 
-                name: 'ANASSE', 
-                nickname: 'The Machine', 
-                emoji: '💪', 
-                score: 78, 
-                streak: 8, 
-                workouts: [], 
-                weight: [], 
-                photos: [], 
-                checkIns: {},
-                lastActive: new Date().toISOString(),
-                isOnline: false
-            },
-            bengram: { 
-                name: 'BENGRAM', 
-                nickname: 'The Lightning', 
-                emoji: '⚡', 
-                score: 72, 
-                streak: 5, 
-                workouts: [], 
-                weight: [], 
-                photos: [], 
-                checkIns: {},
-                lastActive: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                isOnline: false
-            },
-            imad: { 
-                name: 'IMAD', 
-                nickname: 'The Rocket', 
-                emoji: '🚀', 
-                score: 81, 
-                streak: 10, 
-                workouts: [], 
-                weight: [], 
-                photos: [], 
-                checkIns: {},
-                lastActive: new Date().toISOString(),
-                isOnline: false
-            }
-        };
-
+        let app, auth, database, storage;
         let currentUser = null;
-        let selectedProfile = null;
-        let posts = [];
-        let aiMessages = [];
+        let userData = {};
+        let leaderboardData = {};
 
-        // Firebase functions
-        function saveToFirebase(path, data) {
-            if (!isFirebaseConnected) {
-                showNotification('⚠️ Firebase not connected!', 'warning');
-                return Promise.resolve();
+        function initializeFirebase() {
+            try {
+                app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                database = firebase.database();
+                storage = firebase.storage();
+                
+                updateFirebaseStatus('connected');
+                console.log('✅ Firebase initialized successfully');
+                
+                // Set up auth state listener
+                auth.onAuthStateChanged(handleAuthStateChange);
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                updateFirebaseStatus('error');
+                return false;
             }
-
-            return database.ref(path).set(data)
-                .then(() => {
-                    console.log(`🔥 Data saved to Firebase: ${path}`);
-                    showNotification('☁️ Synced to cloud!', 'success');
-                })
-                .catch((error) => {
-                    console.error('🔥 Firebase save error:', error);
-                    showNotification('❌ Failed to sync to cloud!', 'error');
-                });
         }
 
-        function loadFromFirebase() {
-            if (!isFirebaseConnected) {
-                showNotification('⚠️ Firebase not connected - using default data', 'warning');
+        function updateFirebaseStatus(status) {
+            const statusElement = document.getElementById('firebaseStatus');
+            const statusText = document.getElementById('statusText');
+            
+            switch (status) {
+                case 'connected':
+                    statusElement.className = 'firebase-status';
+                    statusText.textContent = '🔥 Connected';
+                    break;
+                case 'offline':
+                    statusElement.className = 'firebase-status offline';
+                    statusText.textContent = '⚠️ Offline';
+                    break;
+                case 'error':
+                    statusElement.className = 'firebase-status offline';
+                    statusText.textContent = '❌ Error';
+                    break;
+                default:
+                    statusText.textContent = 'Connecting...';
+            }
+        }
+
+        // Authentication Functions
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        async function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showNotification('Please fill in all fields', 'error');
                 return;
             }
 
-            // Load squad data
-            database.ref('squadData').once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const firebaseData = snapshot.val();
-                        // Merge with default data to ensure all properties exist
-                        Object.keys(squadData).forEach(user => {
-                            if (firebaseData[user]) {
-                                squadData[user] = { ...squadData[user], ...firebaseData[user] };
-                            }
-                        });
-                        updateDisplays();
-                        console.log('✅ Squad data loaded from Firebase');
-                    }
-                })
-                .catch((error) => {
-                    console.error('❌ Failed to load squad data:', error);
-                });
-
-            // Load posts
-            database.ref('posts').once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const firebasePosts = snapshot.val();
-                        posts = Object.values(firebasePosts).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                        updateSocialFeedFromData();
-                        console.log('✅ Posts loaded from Firebase');
-                    }
-                })
-                .catch((error) => {
-                    console.error('❌ Failed to load posts:', error);
-                });
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showNotification('Welcome back! 🎉', 'success');
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification(error.message, 'error');
+            }
         }
 
-        function setupFirebaseListeners() {
-            if (!isFirebaseConnected) return;
+        async function registerUser() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const nickname = document.getElementById('registerNickname').value;
+            
+            if (!name || !email || !password || !nickname) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
 
-            // Listen for squad data changes
-            const squadListener = database.ref('squadData').on('value', (snapshot) => {
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Update user profile
+                await user.updateProfile({
+                    displayName: name
+                });
+                
+                // Create user data in database
+                const initialUserData = {
+                    uid: user.uid,
+                    name: name,
+                    nickname: nickname,
+                    email: email,
+                    score: 0,
+                    streak: 0,
+                    joinDate: new Date().toISOString(),
+                    lastActive: new Date().toISOString(),
+                    checkIns: {},
+                    progressData: [],
+                    isOnline: true
+                };
+                
+                await database.ref(`users/${user.uid}`).set(initialUserData);
+                showNotification('Account created successfully! 🎉', 'success');
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // Check if user exists in database
+                const userSnapshot = await database.ref(`users/${user.uid}`).once('value');
+                
+                if (!userSnapshot.exists()) {
+                    // Create new user data
+                    const nickname = prompt('Enter your squad nickname (e.g., The Beast, The Machine):') || 'Challenger';
+                    
+                    const initialUserData = {
+                        uid: user.uid,
+                        name: user.displayName,
+                        nickname: nickname,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        score: 0,
+                        streak: 0,
+                        joinDate: new Date().toISOString(),
+                        lastActive: new Date().toISOString(),
+                        checkIns: {},
+                        progressData: [],
+                        isOnline: true
+                    };
+                    
+                    await database.ref(`users/${user.uid}`).set(initialUserData);
+                }
+                
+                showNotification('Welcome to FitSquad Pro! 🎉', 'success');
+                
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function signOut() {
+            try {
+                // Update user offline status
+                if (currentUser) {
+                    await database.ref(`users/${currentUser.uid}/isOnline`).set(false);
+                }
+                
+                await auth.signOut();
+                showNotification('Signed out successfully', 'success');
+            } catch (error) {
+                console.error('Sign out error:', error);
+                showNotification('Error signing out', 'error');
+            }
+        }
+
+        function handleAuthStateChange(user) {
+            if (user) {
+                currentUser = user;
+                showMainApp();
+                loadUserData();
+                setupRealtimeListeners();
+                updateUserOnlineStatus(true);
+            } else {
+                currentUser = null;
+                showAuthScreen();
+                cleanupListeners();
+            }
+        }
+
+        function showAuthScreen() {
+            document.getElementById('authContainer').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showMainApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        }
+
+        // User Data Management
+        async function loadUserData() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await database.ref(`users/${currentUser.uid}`).once('value');
                 if (snapshot.exists()) {
-                    const firebaseData = snapshot.val();
-                    Object.keys(squadData).forEach(user => {
-                        if (firebaseData[user]) {
-                            squadData[user] = { ...squadData[user], ...firebaseData[user] };
-                        }
-                    });
-                    updateDisplays();
+                    userData = snapshot.val();
+                    updateUserInterface();
+                }
+                
+                // Load leaderboard data
+                loadLeaderboard();
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showNotification('Error loading data', 'error');
+            }
+        }
+
+        function updateUserInterface() {
+            if (!userData) return;
+            
+            // Update user info in header
+            document.getElementById('userName').textContent = userData.name || 'User';
+            document.getElementById('userAvatar').textContent = (userData.name || 'U').charAt(0).toUpperCase();
+            
+            // Update dashboard metrics
+            document.getElementById('userScore').textContent = userData.score || 0;
+            document.getElementById('userStreak').textContent = userData.streak || 0;
+            
+            // Update progress bar
+            const maxScore = 1000; // Adjust based on your scoring system
+            const progressPercentage = Math.min(100, (userData.score / maxScore) * 100);
+            document.getElementById('userProgressBar').style.width = progressPercentage + '%';
+            
+            // Update today's check-ins
+            updateCheckInButtons();
+            
+            // Update consistency score
+            updateConsistencyScore();
+        }
+
+        async function updateUserOnlineStatus(isOnline) {
+            if (!currentUser) return;
+            
+            try {
+                await database.ref(`users/${currentUser.uid}/isOnline`).set(isOnline);
+                if (isOnline) {
+                    await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
+                }
+            } catch (error) {
+                console.error('Error updating online status:', error);
+            }
+        }
+
+        // Real-time Data Listeners
+        let listeners = [];
+
+        function setupRealtimeListeners() {
+            if (!currentUser) return;
+            
+            // Listen to user data changes
+            const userListener = database.ref(`users/${currentUser.uid}`).on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    userData = snapshot.val();
+                    updateUserInterface();
+                }
+            });
+            
+            // Listen to leaderboard changes
+            const leaderboardListener = database.ref('users').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    leaderboardData = snapshot.val();
                     updateLeaderboard();
-                    updateAccountabilityCheck();
+                    updateTeamStats();
                 }
             });
-
-            // Listen for new posts
-            const postsListener = database.ref('posts').on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const firebasePosts = snapshot.val();
-                    posts = Object.values(firebasePosts).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    updateSocialFeedFromData();
-                }
-            });
-
-            firebaseListeners.push(
-                { ref: 'squadData', listener: squadListener },
-                { ref: 'posts', listener: postsListener }
+            
+            listeners.push(
+                { ref: `users/${currentUser.uid}`, listener: userListener },
+                { ref: 'users', listener: leaderboardListener }
             );
         }
 
-        function setUserOnline(userId, isOnline) {
-            if (!isFirebaseConnected) return;
-
-            squadData[userId].isOnline = isOnline;
-            if (isOnline) {
-                squadData[userId].lastActive = new Date().toISOString();
-            }
-
-            database.ref(`squadData/${userId}/isOnline`).set(isOnline);
-            database.ref(`squadData/${userId}/lastActive`).set(squadData[userId].lastActive);
-        }
-
-        // Login functionality
-        function selectProfile(profileId) {
-            document.querySelectorAll('.profile-option').forEach(option => {
-                option.classList.remove('selected');
+        function cleanupListeners() {
+            listeners.forEach(({ ref, listener }) => {
+                database.ref(ref).off('value', listener);
             });
-            
-            event.target.closest('.profile-option').classList.add('selected');
-            selectedProfile = profileId;
-            document.getElementById('loginBtn').disabled = false;
+            listeners = [];
         }
 
-        function login() {
-            if (selectedProfile) {
-                currentUser = selectedProfile;
-                
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                
-                updateCurrentUserDisplay();
-                setUserOnline(currentUser, true);
-                squadData[currentUser].lastActive = new Date().toISOString();
-                
-                if (isFirebaseConnected) {
-                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-                    setupFirebaseListeners();
-                }
-                
-                loadUserData();
-                showNotification(`Bienvenue ${squadData[currentUser].name}! 🎉`, 'success');
-            }
-        }
-
-        function logout() {
-            if (currentUser) {
-                setUserOnline(currentUser, false);
-                
-                firebaseListeners.forEach(({ ref, listener }) => {
-                    if (isFirebaseConnected) {
-                        database.ref(ref).off('value', listener);
-                    }
-                });
-                firebaseListeners = [];
-            }
+        // Check-in Functions
+        async function quickCheckIn(type) {
+            if (!currentUser) return;
             
-            currentUser = null;
-            selectedProfile = null;
-            
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            
-            document.querySelectorAll('.profile-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            document.getElementById('loginBtn').disabled = true;
-            
-            showNotification('Déconnecté avec succès! 👋', 'info');
-        }
-
-        function updateCurrentUserDisplay() {
-            const userData = squadData[currentUser];
-            document.getElementById('currentUserAvatar').textContent = userData.emoji;
-            document.getElementById('currentUserName').textContent = userData.name;
-        }
-
-        function loadUserData() {
-            updateDashboardStats();
-            updateProfileScores();
-            updateLeaderboard();
-            updateAccountabilityCheck();
-            updateAIAnalysis();
-        }
-
-        // Tab navigation
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Quick check-in functionality
-        function quickCheckIn(type) {
-            const button = event.target;
             const today = new Date().toDateString();
+            const checkInPath = `users/${currentUser.uid}/checkIns/${today}/${type}`;
             
-            if (!squadData[currentUser].checkIns[today]) {
-                squadData[currentUser].checkIns[today] = {};
-            }
-            
-            if (squadData[currentUser].checkIns[today][type]) {
-                delete squadData[currentUser].checkIns[today][type];
-                button.classList.remove('checked');
-                button.textContent = button.textContent.replace(' ✓', '');
-                squadData[currentUser].score = Math.max(0, squadData[currentUser].score - 5);
-            } else {
-                squadData[currentUser].checkIns[today][type] = true;
-                button.classList.add('checked');
-                button.textContent += ' ✓';
-                squadData[currentUser].score += 5;
-                squadData[currentUser].lastActive = new Date().toISOString();
-                updateStreak();
-                showNotification(`Great job! +5 points for ${type}! 🎉`, 'success');
-            }
-            
-            if (isFirebaseConnected) {
-                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-            }
-            updateDisplays();
-        }
-
-        function updateStreak() {
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            
-            const todayStr = today.toDateString();
-            const yesterdayStr = yesterday.toDateString();
-            
-            const todayCheckIns = squadData[currentUser].checkIns[todayStr];
-            const yesterdayCheckIns = squadData[currentUser].checkIns[yesterdayStr];
-            
-            if (todayCheckIns && Object.keys(todayCheckIns).length > 0) {
-                if (yesterdayCheckIns && Object.keys(yesterdayCheckIns).length > 0) {
-                    squadData[currentUser].streak++;
+            try {
+                const snapshot = await database.ref(checkInPath).once('value');
+                const isCheckedIn = snapshot.exists();
+                
+                if (isCheckedIn) {
+                    // Remove check-in
+                    await database.ref(checkInPath).remove();
+                    await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                        return Math.max(0, (score || 0) - 10);
+                    });
+                    showNotification(`${type} check-in removed`, 'warning');
                 } else {
-                    squadData[currentUser].streak = 1;
+                    // Add check-in
+                    await database.ref(checkInPath).set(true);
+                    await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                        return (score || 0) + 10;
+                    });
+                    
+                    // Update streak
+                    await updateStreak();
+                    
+                    showNotification(`Great job! +10 points for ${type}! 🎉`, 'success');
                 }
+                
+                // Update last active
+                await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
+                
+            } catch (error) {
+                console.error('Check-in error:', error);
+                showNotification('Error updating check-in', 'error');
             }
         }
 
-        // Progress tracking
-        function saveProgress() {
-            const weight = document.getElementById('weightInput').value;
-            const bodyfat = document.getElementById('bodyfatInput').value;
-            const energy = document.getElementById('energyInput').value;
+        function updateCheckInButtons() {
+            if (!userData.checkIns) return;
             
-            if (weight) {
-                const progressEntry = {
-                    date: new Date().toISOString(),
-                    weight: parseFloat(weight),
-                    bodyfat: bodyfat ? parseFloat(bodyfat) : null,
-                    energy: energy ? parseInt(energy) : null
-                };
+            const today = new Date().toDateString();
+            const todayCheckIns = userData.checkIns[today] || {};
+            
+            ['workout', 'nutrition', 'sleep', 'hydration'].forEach(type => {
+                const button = document.querySelector(`[onclick="quickCheckIn('${type}')"]`);
+                if (button) {
+                    if (todayCheckIns[type]) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        async function updateStreak() {
+            if (!currentUser) return;
+            
+            try {
+                const checkInsSnapshot = await database.ref(`users/${currentUser.uid}/checkIns`).once('value');
+                const checkInsData = checkInsSnapshot.val() || {};
                 
-                squadData[currentUser].weight.push(progressEntry);
-                squadData[currentUser].score += 3;
-                squadData[currentUser].lastActive = new Date().toISOString();
+                let currentStreak = 0;
+                const today = new Date();
                 
-                showNotification('Progress saved! +3 points! 📊', 'success');
+                // Calculate streak by checking consecutive days
+                for (let i = 0; i <= 365; i++) {
+                    const checkDate = new Date(today);
+                    checkDate.setDate(checkDate.getDate() - i);
+                    const dateString = checkDate.toDateString();
+                    
+                    const dayCheckIns = checkInsData[dateString];
+                    if (dayCheckIns && Object.keys(dayCheckIns).length > 0) {
+                        currentStreak++;
+                    } else {
+                        break;
+                    }
+                }
                 
+                await database.ref(`users/${currentUser.uid}/streak`).set(currentStreak);
+                
+            } catch (error) {
+                console.error('Error updating streak:', error);
+            }
+        }
+
+        // Progress Tracking
+        async function saveProgress() {
+            if (!currentUser) return;
+            
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            const bodyfat = parseFloat(document.getElementById('bodyfatInput').value);
+            const energy = parseInt(document.getElementById('energyInput').value);
+            const sleep = parseFloat(document.getElementById('sleepInput').value);
+            
+            if (!weight) {
+                showNotification('Please enter your weight', 'warning');
+                return;
+            }
+            
+            const progressEntry = {
+                date: new Date().toISOString(),
+                weight: weight,
+                bodyfat: bodyfat || null,
+                energy: energy || null,
+                sleep: sleep || null
+            };
+            
+            try {
+                await database.ref(`users/${currentUser.uid}/progressData`).push(progressEntry);
+                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                    return (score || 0) + 15;
+                });
+                await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
+                
+                showNotification('Progress saved! +15 points! 📊', 'success');
+                
+                // Clear form
                 document.getElementById('weightInput').value = '';
                 document.getElementById('bodyfatInput').value = '';
                 document.getElementById('energyInput').value = '';
+                document.getElementById('sleepInput').value = '';
                 
-                if (isFirebaseConnected) {
-                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-                }
-                updateDisplays();
-            } else {
-                showNotification('Please enter your weight first! ⚠️', 'warning');
+                // Update charts
+                updateProgressCharts();
+                
+            } catch (error) {
+                console.error('Error saving progress:', error);
+                showNotification('Error saving progress', 'error');
             }
         }
 
-        function uploadPhoto() {
-            const photoGrid = document.getElementById('photoGrid');
-            const photoItem = document.createElement('div');
-            photoItem.className = 'photo-item';
-            photoItem.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #e5e7eb; color: #6b7280;">
-                    📷 Photo ${photoGrid.children.length + 1}
-                </div>
-            `;
-            photoGrid.appendChild(photoItem);
-            
-            squadData[currentUser].photos.push({
-                date: new Date().toISOString(),
-                id: Date.now()
-            });
-            
-            squadData[currentUser].score += 10;
-            squadData[currentUser].lastActive = new Date().toISOString();
-            
-            showNotification('Photo uploaded! +10 points! 📸', 'success');
-            
-            if (isFirebaseConnected) {
-                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-            }
-            updateDisplays();
-        }
-
-        // Social features
-        function createPost() {
-            const postText = document.getElementById('postInput').value;
-            if (postText.trim()) {
-                const newPost = {
-                    id: Date.now(),
-                    author: currentUser,
-                    authorName: squadData[currentUser].name,
-                    authorEmoji: squadData[currentUser].emoji,
-                    text: postText,
-                    timestamp: new Date().toISOString(),
-                    likes: 0,
-                    comments: []
-                };
-                
-                if (isFirebaseConnected) {
-                    database.ref(`posts/${newPost.id}`).set(newPost);
-                } else {
-                    posts.unshift(newPost);
-                    updateSocialFeedFromData();
+        // Leaderboard Functions
+        async function loadLeaderboard() {
+            try {
+                const snapshot = await database.ref('users').once('value');
+                if (snapshot.exists()) {
+                    leaderboardData = snapshot.val();
+                    updateLeaderboard();
+                    updateTeamStats();
                 }
-                
-                document.getElementById('postInput').value = '';
-                squadData[currentUser].score += 2;
-                squadData[currentUser].lastActive = new Date().toISOString();
-                
-                showNotification('Post shared with the squad! +2 points! 📝', 'success');
-                
-                if (isFirebaseConnected) {
-                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-                }
-                updateDisplays();
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
             }
         }
 
-        function updateSocialFeedFromData() {
-            const container = document.getElementById('postsContainer');
+        function updateLeaderboard() {
+            const container = document.getElementById('leaderboardContainer');
+            if (!container || !leaderboardData) return;
+            
+            // Convert to array and sort by score
+            const users = Object.values(leaderboardData)
+                .filter(user => user.score !== undefined)
+                .sort((a, b) => (b.score || 0) - (a.score || 0));
+            
             container.innerHTML = '';
             
-            posts.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.className = 'post';
+            users.forEach((user, index) => {
+                const rank = index + 1;
+                const isCurrentUser = user.uid === currentUser?.uid;
                 
-                const timeAgo = getTimeAgo(new Date(post.timestamp));
+                const item = document.createElement('div');
+                item.className = `leaderboard-item ${rank <= 3 ? `rank-${rank}` : ''}`;
                 
-                postElement.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-avatar">${post.authorEmoji}</div>
+                const avatar = user.photoURL ? 
+                    `<img src="${user.photoURL}" alt="${user.name}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` :
+                    `<div class="user-avatar" style="width: 50px; height: 50px; font-size: 1.2rem;">${(user.name || 'U').charAt(0).toUpperCase()}</div>`;
+                
+                const onlineStatus = user.isOnline ? 
+                    '<span style="color: #10b981; font-size: 0.8rem;">🟢 Online</span>' : '';
+                
+                item.innerHTML = `
+                    <div class="user-info">
+                        ${avatar}
                         <div>
-                            <strong>${post.authorName}</strong>
-                            <div style="font-size: 0.9rem; color: #6b7280;">${timeAgo}</div>
+                            <strong>${user.name || 'Unknown'}</strong>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">${user.nickname || ''}</div>
+                            ${onlineStatus}
                         </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        ${post.text}
-                    </div>
-                    <div style="display: flex; gap: 15px; font-size: 0.9rem; color: #6b7280;">
-                        <span onclick="likePost(${post.id})" style="cursor: pointer;">👍 Like (${post.likes})</span>
-                        <span onclick="commentPost(${post.id})" style="cursor: pointer;">💬 Comment</span>
-                        <span onclick="motivatePost(${post.id})" style="cursor: pointer;">🔥 Motivate</span>
+                    <div class="user-stats">
+                        <div class="user-score">${user.score || 0}</div>
+                        <div class="user-streak">${user.streak || 0}-day streak</div>
                     </div>
                 `;
-                container.appendChild(postElement);
+                
+                if (isCurrentUser) {
+                    item.style.borderColor = 'var(--primary-color)';
+                    item.style.backgroundColor = '#eff6ff';
+                    document.getElementById('userRank').textContent = rank;
+                }
+                
+                container.appendChild(item);
+            });
+            
+            // Update header with current leader
+            if (users.length > 0) {
+                document.getElementById('currentLeader').textContent = `Leader: ${users[0].name}`;
+            }
+        }
+
+        function updateTeamStats() {
+            if (!leaderboardData) return;
+            
+            const users = Object.values(leaderboardData);
+            const totalUsers = users.length;
+            
+            // Calculate team average
+            const totalScore = users.reduce((sum, user) => sum + (user.score || 0), 0);
+            const teamAverage = totalUsers > 0 ? Math.round(totalScore / totalUsers) : 0;
+            
+            // Calculate active today
+            const today = new Date().toDateString();
+            const activeToday = users.filter(user => {
+                const lastActive = new Date(user.lastActive || 0);
+                return lastActive.toDateString() === today;
+            }).length;
+            
+            document.getElementById('teamAverage').textContent = teamAverage;
+            document.getElementById('teamActive').textContent = activeToday;
+        }
+
+        // Social Features
+        async function createPost() {
+            const postText = document.getElementById('postInput').value.trim();
+            if (!postText || !currentUser) return;
+            
+            const post = {
+                id: Date.now().toString(),
+                authorId: currentUser.uid,
+                authorName: userData.name || 'Unknown',
+                authorPhoto: userData.photoURL || null,
+                text: postText,
+                timestamp: new Date().toISOString(),
+                likes: 0,
+                comments: []
+            };
+            
+            try {
+                await database.ref(`posts/${post.id}`).set(post);
+                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                    return (score || 0) + 5;
+                });
+                
+                document.getElementById('postInput').value = '';
+                showNotification('Post shared! +5 points! 📝', 'success');
+                
+                loadSocialFeed();
+                
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showNotification('Error sharing post', 'error');
+            }
+        }
+
+        async function loadSocialFeed() {
+            try {
+                const snapshot = await database.ref('posts').orderByChild('timestamp').limitToLast(20).once('value');
+                const posts = [];
+                
+                snapshot.forEach((childSnapshot) => {
+                    posts.push(childSnapshot.val());
+                });
+                
+                posts.reverse(); // Show newest first
+                
+                const container = document.getElementById('feedContainer');
+                container.innerHTML = '';
+                
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.style.cssText = `
+                        border: 1px solid var(--border-color);
+                        border-radius: var(--radius);
+                        padding: 16px;
+                        margin-bottom: 16px;
+                        background: var(--surface-color);
+                    `;
+                    
+                    const timeAgo = getTimeAgo(new Date(post.timestamp));
+                    const avatar = post.authorPhoto ? 
+                        `<img src="${post.authorPhoto}" alt="${post.authorName}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` :
+                        `<div class="user-avatar" style="width: 40px; height: 40px; font-size: 1rem;">${(post.authorName || 'U').charAt(0).toUpperCase()}</div>`;
+                    
+                    postElement.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            ${avatar}
+                            <div>
+                                <strong>${post.authorName}</strong>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">${timeAgo}</div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 12px; line-height: 1.6;">
+                            ${post.text}
+                        </div>
+                        <div style="display: flex; gap: 16px; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span style="cursor: pointer;" onclick="likePost('${post.id}')">👍 Like (${post.likes || 0})</span>
+                            <span style="cursor: pointer;">💬 Comment</span>
+                        </div>
+                    `;
+                    
+                    container.appendChild(postElement);
+                });
+                
+            } catch (error) {
+                console.error('Error loading social feed:', error);
+            }
+        }
+
+        async function likePost(postId) {
+            try {
+                await database.ref(`posts/${postId}/likes`).transaction((likes) => {
+                    return (likes || 0) + 1;
+                });
+                showNotification('Liked! 👍', 'success');
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        }
+
+        // Analytics Functions
+        function updateConsistencyScore() {
+            if (!userData.checkIns) {
+                document.getElementById('consistencyScore').textContent = '0%';
+                return;
+            }
+            
+            const last30Days = [];
+            const today = new Date();
+            
+            for (let i = 0; i < 30; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                last30Days.push(date.toDateString());
+            }
+            
+            const activeDays = last30Days.filter(dateString => {
+                const dayCheckIns = userData.checkIns[dateString];
+                return dayCheckIns && Object.keys(dayCheckIns).length > 0;
+            }).length;
+            
+            const consistencyPercentage = Math.round((activeDays / 30) * 100);
+            document.getElementById('consistencyScore').textContent = consistencyPercentage + '%';
+        }
+
+        function updateProgressCharts() {
+            // Simple chart implementation using Canvas
+            // In a real app, you'd use a charting library like Chart.js
+            
+            if (!userData.progressData || userData.progressData.length === 0) return;
+            
+            const weightData = Object.values(userData.progressData)
+                .filter(entry => entry.weight)
+                .slice(-30); // Last 30 entries
+            
+            drawSimpleChart('weightChart', weightData.map(entry => entry.weight), 'Weight (kg)');
+        }
+
+        function drawSimpleChart(canvasId, data, label) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            if (data.length === 0) {
+                ctx.fillStyle = '#9ca3af';
+                ctx.font = '14px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available', width / 2, height / 2);
+                return;
+            }
+            
+            const max = Math.max(...data);
+            const min = Math.min(...data);
+            const range = max - min || 1;
+            
+            // Draw grid
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i < 5; i++) {
+                const y = (height / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            
+            // Draw line
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            data.forEach((value, index) => {
+                const x = (width / (data.length - 1)) * index;
+                const y = height - ((value - min) / range) * height;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+            
+            // Draw points
+            ctx.fillStyle = '#3b82f6';
+            data.forEach((value, index) => {
+                const x = (width / (data.length - 1)) * index;
+                const y = height - ((value - min) / range) * height;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fill();
             });
         }
 
+        // Utility Functions
         function getTimeAgo(date) {
             const now = new Date();
             const diffInSeconds = Math.floor((now - date) / 1000);
@@ -1600,329 +1462,30 @@
             return `${Math.floor(diffInSeconds / 86400)}d ago`;
         }
 
-        // Leaderboard
-        function updateLeaderboard() {
-            const container = document.getElementById('leaderboardContainer');
-            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
-            
-            container.innerHTML = '';
-            
-            sortedUsers.forEach(([userId, userData], index) => {
-                const rank = index + 1;
-                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
-                
-                const playerCard = document.createElement('div');
-                playerCard.className = `player-card ${rankClass}`;
-                
-                playerCard.innerHTML = `
-                    <div class="player-info">
-                        <div class="player-avatar">${userData.emoji}</div>
-                        <div>
-                            <h3>${userData.name}</h3>
-                            <p>${userData.nickname}</p>
-                            ${userData.isOnline ? '<div style="font-size: 0.8rem; color: #10b981;">🟢 Online</div>' : ''}
-                        </div>
-                    </div>
-                    <div class="player-stats">
-                        <div class="player-score">${userData.score}</div>
-                        <div class="player-streak">${userData.streak}-day streak</div>
-                    </div>
-                `;
-                
-                container.appendChild(playerCard);
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
             });
-        }
-
-        // Accountability check
-        function updateAccountabilityCheck() {
-            const container = document.getElementById('accountabilityContainer');
-            container.innerHTML = '';
+            event.target.classList.add('active');
             
-            Object.entries(squadData).forEach(([userId, userData]) => {
-                if (userId === currentUser) return;
-                
-                const lastActive = new Date(userData.lastActive);
-                const daysSinceActive = Math.floor((new Date() - lastActive) / (1000 * 60 * 60 * 24));
-                
-                const cardColor = daysSinceActive > 1 ? '#fef3c7' : '#d1fae5';
-                const textColor = daysSinceActive > 1 ? '#92400e' : '#047857';
-                const buttonColor = daysSinceActive > 1 ? '#f59e0b' : '#10b981';
-                
-                const accountabilityCard = document.createElement('div');
-                accountabilityCard.style.cssText = `
-                    text-align: center; 
-                    padding: 20px; 
-                    background: ${cardColor}; 
-                    border-radius: 12px; 
-                    margin: 10px;
-                    display: inline-block;
-                    min-width: 200px;
-                `;
-                
-                accountabilityCard.innerHTML = `
-                    <div style="font-size: 2rem; margin-bottom: 10px;">${userData.emoji}</div>
-                    <strong>${userData.name}</strong>
-                    <div style="font-size: 0.9rem; color: ${textColor}; margin-top: 5px;">
-                        ${daysSinceActive > 1 ? `Last active: ${daysSinceActive} days ago` : 'Active today! 💪'}
-                    </div>
-                    <button class="btn" onclick="sendMotivation('${userId}')" style="margin-top: 10px; background: ${buttonColor}; color: white; font-size: 0.9rem;">
-                        ${daysSinceActive > 1 ? '🔥 Motivate' : '👍 Encourage'}
-                    </button>
-                `;
-                
-                container.appendChild(accountabilityCard);
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
             });
-        }
-
-        // AI features
-        function updateAIAnalysis() {
-            const analysisContainer = document.getElementById('aiAnalysis');
-            const users = Object.values(squadData);
+            document.getElementById(tabName).classList.add('active');
             
-            analysisContainer.innerHTML = `
-                <ul style="margin-left: 20px; line-height: 1.6;">
-                    <li><strong>Mehdi:</strong> Excellent consistency! Your workout frequency is 94%. Consider adding more cardio for optimal fat loss.</li>
-                    <li><strong>Imad:</strong> Strong nutrition game! Your meal consistency is impressive. Focus on progressive overload in the gym.</li>
-                    <li><strong>Anasse:</strong> Good momentum building. Your energy levels correlate with sleep quality - prioritize 8+ hours.</li>
-                    <li><strong>Bengram:</strong> Potential detected! You respond well to challenges. Set micro-goals for better consistency.</li>
-                </ul>
-            `;
-            
-            // Update win probability
-            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
-            const total = sortedUsers.reduce((sum, [_, data]) => sum + data.score, 0);
-            
-            const probabilities = sortedUsers.map(([userId, data]) => {
-                const probability = Math.round((data.score / total) * 100);
-                return `${data.emoji} ${data.name}: ${probability}%`;
-            });
-            
-            document.getElementById('winProbability').textContent = probabilities.join(' | ');
-        }
-
-        function sendAIMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message) {
-                addAIMessage('user', message);
-                input.value = '';
-                
-                setTimeout(() => {
-                    const response = generateAIResponse(message);
-                    addAIMessage('ai', response);
-                }, 1000);
+            // Load tab-specific data
+            if (tabName === 'social') {
+                loadSocialFeed();
+            } else if (tabName === 'progress') {
+                updateProgressCharts();
             }
         }
 
-        function askAI(question) {
-            document.getElementById('chatInput').value = question;
-            sendAIMessage();
-        }
-
-        function addAIMessage(sender, message) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.style.marginBottom = '15px';
-            
-            if (sender === 'user') {
-                messageDiv.innerHTML = `<strong>${squadData[currentUser].name}:</strong> ${message}`;
-            } else {
-                messageDiv.innerHTML = `<strong>AI Coach:</strong> ${message}`;
-            }
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function generateAIResponse(message) {
-            const responses = {
-                'plateau': `Hey ${squadData[currentUser].name}! To break a plateau, try: 1) Change rep ranges 2) Add new exercises 3) Increase training frequency 4) Adjust nutrition timing. Your body adapts quickly - keep it guessing! 💪`,
-                'meal': `Perfect question ${squadData[currentUser].name}! Best post-workout meal: Protein + Carbs within 30min. Try: Chicken + rice, Greek yogurt + banana, or protein shake + oats. Aim for 20-30g protein! 🥗`,
-                'motivation': `${squadData[currentUser].name}, motivation tips: 1) Remember your WHY 2) Track small wins 3) Find an accountability partner 4) Celebrate progress 5) Focus on the process, not just results! You're currently rank ${getCurrentRank()} - keep pushing! 🔥`,
-                'rest': `Great question! Optimal rest: 2-3 minutes for compound exercises, 1-2 minutes for isolation. Listen to your body - when you can maintain intensity, you\'re ready! ⏱️`
-            };
-            
-            const lowerMessage = message.toLowerCase();
-            
-            if (lowerMessage.includes('plateau')) return responses.plateau;
-            if (lowerMessage.includes('meal') || lowerMessage.includes('food')) return responses.meal;
-            if (lowerMessage.includes('motivat')) return responses.motivation;
-            if (lowerMessage.includes('rest') || lowerMessage.includes('time')) return responses.rest;
-            
-            return `Great question ${squadData[currentUser].name}! Based on your current progress (${squadData[currentUser].score} points, ${squadData[currentUser].streak}-day streak), I recommend focusing on consistency and progressive overload. You're doing amazing! Keep pushing! 🚀`;
-        }
-
-        function getCurrentRank() {
-            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
-            const rank = sortedUsers.findIndex(([user, data]) => user === currentUser) + 1;
-            return rank;
-        }
-
-        function acceptAIChallenge() {
-            squadData[currentUser].score += 10;
-            squadData[currentUser].lastActive = new Date().toISOString();
-            showNotification('AI Challenge accepted! +10 points! 🤖', 'success');
-            
-            if (isFirebaseConnected) {
-                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-            }
-            updateDisplays();
-        }
-
-        // Challenge functions
-        function createChallenge() {
-            const title = document.getElementById('challengeTitle').value;
-            const desc = document.getElementById('challengeDesc').value;
-            const duration = document.getElementById('challengeDuration').value;
-            
-            if (title && desc) {
-                showNotification(`Challenge "${title}" created! 🎯`, 'success');
-                
-                document.getElementById('challengeTitle').value = '';
-                document.getElementById('challengeDesc').value = '';
-                
-                squadData[currentUser].score += 5;
-                squadData[currentUser].lastActive = new Date().toISOString();
-                
-                if (isFirebaseConnected) {
-                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-                }
-                updateDisplays();
-            } else {
-                showNotification('Please fill in title and description! ⚠️', 'warning');
-            }
-        }
-
-        function uploadChallengePhoto() {
-            showNotification('Challenge photo uploaded! 📸', 'success');
-        }
-
-        // Social interaction functions
-        function likePost(postId) {
-            showNotification('Liked! 👍', 'success');
-        }
-
-        function commentPost(postId) {
-            const comment = prompt('Add a comment:');
-            if (comment) {
-                showNotification('Comment added! 💬', 'success');
-            }
-        }
-
-        function motivatePost(postId) {
-            showNotification('Motivation sent! 🔥', 'success');
-        }
-
-        function addPhoto() {
-            showNotification('Photo feature coming soon! 📷', 'info');
-        }
-
-        function shareWorkout() {
-            const workouts = [
-                "Just finished an epic chest and triceps session! 💪",
-                "Deadlift day! Feeling stronger than ever! 🔥",
-                "Cardio done! 30 minutes of pure sweat! 🏃‍♂️",
-                "Leg day complete! Can barely walk! 🦵",
-                "Full body workout in the books! 💯"
-            ];
-            
-            const randomWorkout = workouts[Math.floor(Math.random() * workouts.length)];
-            document.getElementById('postInput').value = randomWorkout;
-            showNotification('Workout shared! Now post it! 💪', 'info');
-        }
-
-        function sendMotivation(member) {
-            squadData[currentUser].score += 1;
-            squadData[currentUser].lastActive = new Date().toISOString();
-            showNotification(`Motivation sent to ${squadData[member].name}! +1 point! 🔥`, 'success');
-            
-            if (isFirebaseConnected) {
-                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-            }
-            updateDisplays();
-        }
-
-        function switchToProfile(profileId) {
-            if (profileId !== currentUser) {
-                showNotification(`Switched to view ${squadData[profileId].name}'s profile! 👤`, 'info');
-            }
-        }
-
-        // Display update functions
-        function updateProfileScores() {
-            Object.keys(squadData).forEach(user => {
-                const scoreElement = document.getElementById(`${user}-score`);
-                const streakElement = document.getElementById(`${user}-streak`);
-                
-                if (scoreElement) scoreElement.textContent = squadData[user].score;
-                if (streakElement) streakElement.textContent = squadData[user].streak;
-            });
-        }
-
-        function updateDashboardStats() {
-            const users = Object.values(squadData);
-            const averageScore = Math.round(users.reduce((sum, user) => sum + user.score, 0) / users.length);
-            const maxStreak = Math.max(...users.map(user => user.streak));
-            
-            document.getElementById('averageScore').textContent = averageScore;
-            document.getElementById('teamStreak').textContent = maxStreak;
-        }
-
-        function updateDisplays() {
-            if (!currentUser) return;
-            
-            // Update global progress
-            const startDate = new Date('2025-06-01');
-            const currentDate = new Date();
-            const totalDays = 365;
-            const completedDays = Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24));
-            const percentage = Math.max(0, Math.min(100, (completedDays / totalDays) * 100));
-            
-            document.getElementById('globalProgress').textContent = percentage.toFixed(1) + '%';
-            document.getElementById('globalPercentage').textContent = percentage.toFixed(1) + '%';
-            document.getElementById('daysRemaining').textContent = Math.max(0, totalDays - completedDays);
-            
-            // Update current leader
-            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
-            document.getElementById('currentLeader').textContent = sortedUsers[0][1].name;
-            
-            // Update progress circle
-            const circumference = 2 * Math.PI * 65;
-            const progressCircle = document.getElementById('globalProgressCircle');
-            const strokeDashoffset = circumference - (percentage / 100) * circumference;
-            progressCircle.style.strokeDasharray = circumference;
-            progressCircle.style.strokeDashoffset = strokeDashoffset;
-            
-            updateProfileScores();
-            updateDashboardStats();
-        }
-
-        // Utility functions
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            
-            const colors = {
-                success: '#10b981',
-                warning: '#f59e0b',
-                error: '#ef4444',
-                info: '#3b82f6'
-            };
-            
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${colors[type] || colors.success};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-                max-width: 300px;
-                border-left: 4px solid rgba(255,255,255,0.3);
-            `;
+            notification.className = `notification ${type}`;
             notification.textContent = message;
             
             document.body.appendChild(notification);
@@ -1933,334 +1496,50 @@
             }, 3000);
         }
 
-        function exportData() {
-            const dataToExport = {
-                squadData: squadData,
-                posts: posts,
-                exportDate: new Date().toISOString(),
-                version: '2.0',
-                firebaseEnabled: isFirebaseConnected
-            };
+        // Global Progress Updates
+        function updateGlobalProgress() {
+            const startDate = new Date('2025-06-01');
+            const endDate = new Date('2026-06-01');
+            const currentDate = new Date();
             
-            const dataStr = JSON.stringify(dataToExport, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            const completedDays = Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24));
+            const remainingDays = Math.max(0, totalDays - completedDays);
             
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `squad-battle-backup-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
+            const percentage = Math.max(0, Math.min(100, (completedDays / totalDays) * 100));
             
-            showNotification('📥 Data exported successfully!', 'success');
+            document.getElementById('globalProgress').textContent = `Progress: ${percentage.toFixed(1)}%`;
+            document.getElementById('daysRemaining').textContent = `Days left: ${remainingDays}`;
         }
 
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const importedData = JSON.parse(e.target.result);
-                            if (importedData.squadData && importedData.posts) {
-                                squadData = importedData.squadData;
-                                posts = importedData.posts;
-                                
-                                if (isFirebaseConnected) {
-                                    saveToFirebase('squadData', squadData);
-                                    saveToFirebase('posts', posts.reduce((acc, post) => {
-                                        acc[post.id] = post;
-                                        return acc;
-                                    }, {}));
-                                }
-                                
-                                updateDisplays();
-                                updateSocialFeedFromData();
-                                showNotification('📤 Data imported successfully!', 'success');
-                            } else {
-                                showNotification('⚠️ Invalid data file format', 'warning');
-                            }
-                        } catch (error) {
-                            showNotification('❌ Failed to import data', 'error');
-                            console.error('Import error:', error);
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            input.click();
-        }
-
-        function clearAllData() {
-            if (confirm('⚠️ This will delete ALL squad data permanently! Are you sure?')) {
-                if (isFirebaseConnected) {
-                    database.ref('squadData').remove();
-                    database.ref('posts').remove();
-                    showNotification('🔥 Firebase data cleared!', 'warning');
-                }
-                
-                Object.keys(squadData).forEach(user => {
-                    squadData[user].score = 0;
-                    squadData[user].streak = 0;
-                    squadData[user].checkIns = {};
-                    squadData[user].weight = [];
-                    squadData[user].photos = [];
-                });
-                posts = [];
-                
-                location.reload();
-            }
-        }
-
-        function showDataInfo() {
-            const dataSize = JSON.stringify(squadData).length;
-            const postCount = posts.length;
-            const onlineUsers = Object.values(squadData).filter(user => user.isOnline).length;
-            
-            alert(`📊 Data Information:
-            
-${isFirebaseConnected ? '🔥 Firebase: Connected' : '❌ Firebase: Not Connected'}
-📏 Data size: ${(dataSize / 1024).toFixed(2)} KB
-📝 Posts: ${postCount}
-👥 Users: ${Object.keys(squadData).length}
-🟢 Online: ${onlineUsers} users
-
-${isFirebaseConnected ? '✅ Real-time sync active' : '⚠️ No real-time sync - Firebase not configured'}`);
-        }
-
-        function testFirebaseConnection() {
-            if (!isFirebaseConnected) {
-                showNotification('Firebase not connected!', 'error');
-                return;
-            }
-            
-            showNotification('Testing Firebase connection...', 'info');
-            
-            database.ref('test').set({
-                timestamp: new Date().toISOString(),
-                user: currentUser || 'anonymous'
-            }).then(() => {
-                showNotification('🔥 Firebase connection successful!', 'success');
-                return database.ref('test').remove();
-            }).catch((error) => {
-                showNotification('❌ Firebase connection failed!', 'error');
-                console.error('Firebase test error:', error);
-            });
-        }
-
-        function showFirebaseSetup() {
-            const setupInstructions = `
-🔥 Firebase Setup Instructions:
-
-1. Go to https://console.firebase.google.com/
-2. Create a new project
-3. Enable Realtime Database
-4. Set rules to: { "rules": { ".read": true, ".write": true } }
-5. Copy your config from Project Settings > General > Web apps
-6. Replace the firebaseConfig object in the HTML file
-
-Your config should look like:
-{
-  apiKey: "your-actual-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-  projectId: "your-project-id",
-  // ... other config
-}
-
-Then redeploy your HTML file!
-            `;
-            
-            alert(setupInstructions);
-        }
-
-        // Daily motivations
-        const dailyMotivations = [
-            "Today, you choose between 'I wish' and 'I will' - Choose wisely! 💪",
-            "Champions don't become champions in the ring - They're made in training! 🥊",
-            "Your only competition? The person you were yesterday! Beat him! 🚀",
-            "Success is the sum of small efforts repeated daily! Keep summing! ➕",
-            "Every workout is a deposit in your future self's bank account! 💰",
-            "The pain you feel today will be the strength you feel tomorrow! 🔥",
-            "Don't wish for it, work for it! The 20K DH is waiting! 💎",
-            "Your body can stand almost anything. It's your mind you have to convince! 🧠"
-        ];
-
-        function updateDailyMotivation() {
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-            const motivationIndex = dayOfYear % dailyMotivations.length;
-            document.getElementById('dailyMotivation').textContent = dailyMotivations[motivationIndex];
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.activeElement.id === 'chatInput') {
-                sendAIMessage();
-            }
-            
-            if (e.key === 'Enter' && e.ctrlKey && document.activeElement.id === 'postInput') {
-                createPost();
-            }
-        });
-
-        // Initialize app
-        function initApp() {
-            updateDailyMotivation();
-            
-            // Load data from Firebase
-            loadFromFirebase();
-            
-            // Add CSS animations
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-                
-                .profile-option:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                }
-                
-                .btn:hover {
-                    transform: translateY(-1px);
-                }
-                
-                .player-card:hover {
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                }
-                
-                .data-management {
-                    position: fixed;
-                    bottom: 20px;
-                    left: 20px;
-                    z-index: 1000;
-                }
-                
-                .data-btn {
-                    display: block;
-                    margin: 5px 0;
-                    padding: 8px 12px;
-                    background: ${isFirebaseConnected ? '#10b981' : '#374151'};
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    font-size: 0.8rem;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    transition: opacity 0.3s;
-                }
-                
-                .data-btn:hover {
-                    opacity: 1;
-                }
-                
-                .firebase-status {
-                    position: fixed;
-                    top: 10px;
-                    left: 10px;
-                    padding: 5px 10px;
-                    border-radius: 15px;
-                    font-size: 0.7rem;
-                    font-weight: bold;
-                    z-index: 1000;
-                    ${isFirebaseConnected ? 
-                        'background: #10b981; color: white;' : 
-                        'background: #f59e0b; color: white;'
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Add Firebase connection status indicator
-            const statusIndicator = document.createElement('div');
-            statusIndicator.className = 'firebase-status';
-            statusIndicator.textContent = isFirebaseConnected ? '🔥 LIVE' : '⚠️ OFFLINE';
-            statusIndicator.title = isFirebaseConnected ? 
-                'Connected to Firebase - Real-time sync active' : 
-                'Firebase not connected - No real-time sync';
-            document.body.appendChild(statusIndicator);
-            
-            // Add data management buttons
-            const dataManagement = document.createElement('div');
-            dataManagement.className = 'data-management';
-            dataManagement.innerHTML = `
-                <button class="data-btn" onclick="exportData()" title="Export all data">📥 Export</button>
-                <button class="data-btn" onclick="importData()" title="Import data">📤 Import</button>
-                <button class="data-btn" onclick="clearAllData()" title="Clear all data">🗑️ Reset</button>
-                <button class="data-btn" onclick="showDataInfo()" title="Data info">ℹ️ Info</button>
-                ${isFirebaseConnected ? 
-                    '<button class="data-btn" onclick="testFirebaseConnection()" title="Test connection">🔥 Test</button>' : 
-                    '<button class="data-btn" onclick="showFirebaseSetup()" title="Setup Firebase">⚙️ Setup</button>'
-                }
-            `;
-            document.body.appendChild(dataManagement);
-        }
-
-        // Real-time updates simulation (for when Firebase is not connected)
-        function simulateRealTimeUpdates() {
-            if (!isFirebaseConnected) {
-                setInterval(() => {
-                    if (currentUser) {
-                        Object.keys(squadData).forEach(user => {
-                            if (user !== currentUser && Math.random() < 0.05) {
-                                squadData[user].score += Math.floor(Math.random() * 3);
-                                if (squadData[user].score > 100) squadData[user].score = 100;
-                            }
-                        });
-                        updateDisplays();
-                    }
-                }, 30000);
-            }
-        }
-
-        // Start the app
-        initApp();
-        simulateRealTimeUpdates();
-        
-        // Update displays every hour
-        setInterval(updateDisplays, 3600000);
-        
-        // Show welcome message
-        setTimeout(() => {
-            if (!currentUser) {
-                showNotification(
-                    isFirebaseConnected ? 
-                    '🔥 Firebase connected! Real-time sync ready!' : 
-                    '⚠️ Firebase not configured. Add your config for real-time sync!', 
-                    isFirebaseConnected ? 'success' : 'warning'
-                );
-            }
-        }, 2000);
-
-        // Handle page visibility changes for online status
+        // Page Visibility API for online status
         document.addEventListener('visibilitychange', () => {
             if (currentUser) {
-                const isVisible = !document.hidden;
-                setUserOnline(currentUser, isVisible);
-                if (isVisible) {
-                    squadData[currentUser].lastActive = new Date().toISOString();
-                    if (isFirebaseConnected) {
-                        saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
-                    }
-                }
+                updateUserOnlineStatus(!document.hidden);
             }
         });
 
         // Handle page unload
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
-                setUserOnline(currentUser, false);
+                updateUserOnlineStatus(false);
             }
         });
+
+        // Initialize the application
+        function initializeApp() {
+            if (initializeFirebase()) {
+                updateGlobalProgress();
+                
+                // Update global progress every hour
+                setInterval(updateGlobalProgress, 3600000);
+                
+                console.log('✅ FitSquad Pro initialized successfully');
+            } else {
+                showNotification('Firebase configuration required', 'error');
+            }
+        }
+
     </script>
 </body>
 </html>
