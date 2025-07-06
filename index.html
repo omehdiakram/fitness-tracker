@@ -1,15 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitSquad Pro - 20K DH Challenge</title>
-    
-    <!-- Firebase SDKs v8 (more stable for basic projects) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -137,6 +131,15 @@
 
         .btn-secondary:hover {
             background: #475569;
+        }
+
+        .btn-google {
+            background: #4285f4;
+            margin-top: 12px;
+        }
+
+        .btn-google:hover {
+            background: #3367d6;
         }
 
         .auth-divider {
@@ -272,17 +275,11 @@
             box-shadow: var(--shadow-lg);
         }
 
-        .card-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
+            margin-bottom: 20px;
         }
 
         .metric-value {
@@ -311,67 +308,6 @@
             height: 100%;
             background: linear-gradient(90deg, var(--primary-color), var(--success-color));
             transition: width 0.5s ease;
-        }
-
-        .leaderboard {
-            background: var(--surface-color);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            margin: 8px 0;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .leaderboard-item:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .leaderboard-item.rank-1 {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: white;
-            border-color: #d97706;
-        }
-
-        .leaderboard-item.rank-2 {
-            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-            color: white;
-            border-color: #6b7280;
-        }
-
-        .leaderboard-item.rank-3 {
-            background: linear-gradient(135deg, #cd7c2f, #b45309);
-            color: white;
-            border-color: #92400e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-stats {
-            text-align: right;
-        }
-
-        .user-score {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .user-streak {
-            font-size: 0.875rem;
-            opacity: 0.8;
         }
 
         .quick-actions {
@@ -434,27 +370,16 @@
             font-size: 0.8rem;
             font-weight: 600;
             z-index: 1000;
-            background: var(--success-color);
+            background: var(--warning-color);
             color: white;
         }
 
-        .firebase-status.offline {
+        .firebase-status.connected {
+            background: var(--success-color);
+        }
+
+        .firebase-status.error {
             background: var(--error-color);
-        }
-
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 24px;
-        }
-
-        .chart-container {
-            background: var(--surface-color);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            min-height: 300px;
         }
 
         .hidden {
@@ -487,7 +412,7 @@
 <body>
     <!-- Firebase Connection Status -->
     <div id="firebaseStatus" class="firebase-status">
-        <span id="statusText">Connecting...</span>
+        <span id="statusText">Initializing...</span>
     </div>
 
     <!-- Authentication Screen -->
@@ -513,7 +438,7 @@
                     <span>or</span>
                 </div>
                 
-                <button class="btn btn-secondary" onclick="signInWithGoogle()">
+                <button class="btn btn-google" onclick="signInWithGoogle()">
                     Sign in with Google
                 </button>
             </div>
@@ -565,7 +490,6 @@
             <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
             <button class="nav-tab" onclick="showTab('progress')">Progress</button>
             <button class="nav-tab" onclick="showTab('leaderboard')">Leaderboard</button>
-            <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
             <button class="nav-tab" onclick="showTab('social')">Feed</button>
         </div>
 
@@ -573,9 +497,7 @@
         <div id="dashboard" class="tab-content active">
             <div class="dashboard-grid">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Your Progress</h3>
-                    </div>
+                    <h3 class="card-title">Your Progress</h3>
                     <div class="metric-value" id="userScore">0</div>
                     <div class="metric-label">Total Points</div>
                     <div class="progress-bar">
@@ -588,9 +510,7 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Quick Check-in</h3>
-                    </div>
+                    <h3 class="card-title">Quick Check-in</h3>
                     <div class="quick-actions">
                         <div class="action-btn" onclick="quickCheckIn('workout')">
                             💪 Workout
@@ -608,9 +528,7 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Team Stats</h3>
-                    </div>
+                    <h3 class="card-title">Team Stats</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
                             <div class="metric-value" id="teamAverage">0</div>
@@ -625,96 +543,38 @@
             </div>
         </div>
 
-        <!-- Progress Tab -->
+        <!-- Other tabs content here... -->
         <div id="progress" class="tab-content">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Log Your Progress</h3>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                    <div class="form-group">
-                        <label class="form-label">Weight (kg)</label>
-                        <input type="number" class="form-input" id="weightInput" placeholder="Enter weight" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Body Fat %</label>
-                        <input type="number" class="form-input" id="bodyfatInput" placeholder="Enter body fat %" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Energy Level (1-10)</label>
-                        <input type="number" class="form-input" id="energyInput" placeholder="Rate your energy" min="1" max="10">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Sleep Hours</label>
-                        <input type="number" class="form-input" id="sleepInput" placeholder="Hours slept" step="0.5">
-                    </div>
-                </div>
-                <button class="btn" onclick="saveProgress()" style="margin-top: 16px;">Save Progress</button>
-            </div>
-
-            <div class="analytics-grid">
-                <div class="chart-container">
-                    <h4>Weight Trend</h4>
-                    <canvas id="weightChart" width="400" height="200"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Daily Score</h4>
-                    <canvas id="scoreChart" width="400" height="200"></canvas>
-                </div>
+                <h3 class="card-title">Coming Soon</h3>
+                <p>Progress tracking features will be available soon!</p>
             </div>
         </div>
 
-        <!-- Leaderboard Tab -->
         <div id="leaderboard" class="tab-content">
-            <div class="leaderboard">
-                <h2 class="card-title" style="text-align: center; margin-bottom: 24px;">Live Rankings</h2>
+            <div class="card">
+                <h3 class="card-title">Live Rankings</h3>
                 <div id="leaderboardContainer">
-                    <!-- Leaderboard items will be populated here -->
+                    <p>Loading leaderboard...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Analytics Tab -->
-        <div id="analytics" class="tab-content">
-            <div class="dashboard-grid">
-                <div class="card">
-                    <h3 class="card-title">Performance Metrics</h3>
-                    <div id="performanceMetrics">
-                        <!-- Metrics will be populated here -->
-                    </div>
-                </div>
-                <div class="card">
-                    <h3 class="card-title">Consistency Score</h3>
-                    <div class="metric-value" id="consistencyScore">0%</div>
-                    <div class="metric-label">Based on daily check-ins</div>
-                </div>
-                <div class="card">
-                    <h3 class="card-title">Predictions</h3>
-                    <div id="predictions">
-                        <p>AI analysis based on your progress patterns...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Social Tab -->
         <div id="social" class="tab-content">
             <div class="card">
                 <h3 class="card-title">Team Feed</h3>
-                <div class="form-group">
-                    <textarea class="form-input" id="postInput" rows="3" placeholder="Share your progress, motivation, or achievements..."></textarea>
-                </div>
-                <button class="btn" onclick="createPost()">Share Update</button>
-                
-                <div id="feedContainer" style="margin-top: 24px;">
-                    <!-- Feed posts will be populated here -->
-                </div>
+                <p>Social features coming soon!</p>
             </div>
         </div>
     </div>
 
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
-        // Firebase Configuration - Your actual config
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBYXcm6oJNsTLnRyLB8hv7tmOCX6QOFTyw",
             authDomain: "fitness-tracker-eff06.firebaseapp.com",
@@ -726,30 +586,38 @@
             measurementId: "G-QCVWJM25GF"
         };
 
-        // Initialize Firebase
-        let app, auth, database, storage;
+        // Global variables
+        let auth = null;
+        let database = null;
         let currentUser = null;
         let userData = {};
-        let leaderboardData = {};
 
+        // Initialize Firebase
         function initializeFirebase() {
             try {
-                // Initialize Firebase with v8 SDK
+                console.log('🔥 Initializing Firebase...');
+                
+                // Check if Firebase is loaded
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK not loaded');
+                }
+
+                // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 database = firebase.database();
-                storage = firebase.storage();
                 
-                updateFirebaseStatus('connected');
                 console.log('✅ Firebase initialized successfully');
+                updateFirebaseStatus('connected');
                 
                 // Set up auth state listener
                 auth.onAuthStateChanged(handleAuthStateChange);
                 
                 return true;
             } catch (error) {
-                console.error('❌ Firebase initialization error:', error);
+                console.error('❌ Firebase initialization failed:', error);
                 updateFirebaseStatus('error');
+                showNotification('Firebase initialization failed: ' + error.message, 'error');
                 return false;
             }
         }
@@ -758,17 +626,13 @@
             const statusElement = document.getElementById('firebaseStatus');
             const statusText = document.getElementById('statusText');
             
+            statusElement.className = 'firebase-status ' + status;
+            
             switch (status) {
                 case 'connected':
-                    statusElement.className = 'firebase-status';
                     statusText.textContent = '🔥 Connected';
                     break;
-                case 'offline':
-                    statusElement.className = 'firebase-status offline';
-                    statusText.textContent = '⚠️ Offline';
-                    break;
                 case 'error':
-                    statusElement.className = 'firebase-status offline';
                     statusText.textContent = '❌ Error';
                     break;
                 default:
@@ -788,7 +652,7 @@
         }
 
         async function loginUser() {
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
             if (!email || !password) {
@@ -802,39 +666,20 @@
             }
 
             try {
-                const result = await auth.signInWithEmailAndPassword(email, password);
+                console.log('🔑 Attempting login...');
+                await auth.signInWithEmailAndPassword(email, password);
                 showNotification('Welcome back! 🎉', 'success');
-                console.log('User signed in:', result.user.uid);
             } catch (error) {
                 console.error('Login error:', error);
-                let errorMessage = 'Login failed';
-                
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'Incorrect password';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Invalid email address';
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = 'This account has been disabled';
-                        break;
-                    default:
-                        errorMessage = error.message;
-                }
-                
-                showNotification(errorMessage, 'error');
+                showNotification(getErrorMessage(error), 'error');
             }
         }
 
         async function registerUser() {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
-            const nickname = document.getElementById('registerNickname').value;
+            const nickname = document.getElementById('registerNickname').value.trim();
             
             if (!name || !email || !password || !nickname) {
                 showNotification('Please fill in all fields', 'error');
@@ -846,21 +691,20 @@
                 return;
             }
 
-            if (!auth) {
+            if (!auth || !database) {
                 showNotification('Firebase not initialized. Please refresh the page.', 'error');
                 return;
             }
 
             try {
+                console.log('📝 Creating account...');
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Update user profile
-                await user.updateProfile({
-                    displayName: name
-                });
+                // Update profile
+                await user.updateProfile({ displayName: name });
                 
-                // Create user data in database
+                // Create user data
                 const initialUserData = {
                     uid: user.uid,
                     name: name,
@@ -871,49 +715,35 @@
                     joinDate: new Date().toISOString(),
                     lastActive: new Date().toISOString(),
                     checkIns: {},
-                    progressData: [],
                     isOnline: true
                 };
                 
                 await database.ref(`users/${user.uid}`).set(initialUserData);
                 showNotification('Account created successfully! 🎉', 'success');
-                console.log('User registered:', user.uid);
                 
             } catch (error) {
                 console.error('Registration error:', error);
-                let errorMessage = 'Registration failed';
-                
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'An account with this email already exists';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Invalid email address';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = 'Password is too weak';
-                        break;
-                    default:
-                        errorMessage = error.message;
-                }
-                
-                showNotification(errorMessage, 'error');
+                showNotification(getErrorMessage(error), 'error');
             }
         }
 
         async function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
+            if (!auth) {
+                showNotification('Firebase not initialized. Please refresh the page.', 'error');
+                return;
+            }
+
             try {
+                console.log('🔍 Google sign-in...');
+                const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await auth.signInWithPopup(provider);
                 const user = result.user;
                 
-                // Check if user exists in database
+                // Check if user exists
                 const userSnapshot = await database.ref(`users/${user.uid}`).once('value');
                 
                 if (!userSnapshot.exists()) {
-                    // Create new user data
-                    const nickname = prompt('Enter your squad nickname (e.g., The Beast, The Machine):') || 'Challenger';
+                    const nickname = prompt('Enter your squad nickname:') || 'Challenger';
                     
                     const initialUserData = {
                         uid: user.uid,
@@ -926,7 +756,6 @@
                         joinDate: new Date().toISOString(),
                         lastActive: new Date().toISOString(),
                         checkIns: {},
-                        progressData: [],
                         isOnline: true
                     };
                     
@@ -937,17 +766,17 @@
                 
             } catch (error) {
                 console.error('Google sign-in error:', error);
-                showNotification('Google sign-in failed: ' + error.message, 'error');
+                showNotification('Google sign-in failed: ' + getErrorMessage(error), 'error');
             }
         }
 
         async function signOut() {
+            if (!auth) return;
+            
             try {
-                // Update user offline status
                 if (currentUser) {
                     await database.ref(`users/${currentUser.uid}/isOnline`).set(false);
                 }
-                
                 await auth.signOut();
                 showNotification('Signed out successfully', 'success');
             } catch (error) {
@@ -957,16 +786,16 @@
         }
 
         function handleAuthStateChange(user) {
+            console.log('🔄 Auth state changed:', user ? 'signed in' : 'signed out');
+            
             if (user) {
                 currentUser = user;
                 showMainApp();
                 loadUserData();
-                setupRealtimeListeners();
                 updateUserOnlineStatus(true);
             } else {
                 currentUser = null;
                 showAuthScreen();
-                cleanupListeners();
             }
         }
 
@@ -980,9 +809,9 @@
             document.getElementById('mainApp').style.display = 'block';
         }
 
-        // User Data Management
+        // User Data Functions
         async function loadUserData() {
-            if (!currentUser) return;
+            if (!currentUser || !database) return;
             
             try {
                 const snapshot = await database.ref(`users/${currentUser.uid}`).once('value');
@@ -990,41 +819,24 @@
                     userData = snapshot.val();
                     updateUserInterface();
                 }
-                
-                // Load leaderboard data
-                loadLeaderboard();
-                
             } catch (error) {
                 console.error('Error loading user data:', error);
-                showNotification('Error loading data', 'error');
             }
         }
 
         function updateUserInterface() {
-            if (!userData) return;
-            
-            // Update user info in header
             document.getElementById('userName').textContent = userData.name || 'User';
             document.getElementById('userAvatar').textContent = (userData.name || 'U').charAt(0).toUpperCase();
-            
-            // Update dashboard metrics
             document.getElementById('userScore').textContent = userData.score || 0;
             document.getElementById('userStreak').textContent = userData.streak || 0;
             
-            // Update progress bar
-            const maxScore = 1000; // Adjust based on your scoring system
+            const maxScore = 1000;
             const progressPercentage = Math.min(100, (userData.score / maxScore) * 100);
             document.getElementById('userProgressBar').style.width = progressPercentage + '%';
-            
-            // Update today's check-ins
-            updateCheckInButtons();
-            
-            // Update consistency score
-            updateConsistencyScore();
         }
 
         async function updateUserOnlineStatus(isOnline) {
-            if (!currentUser) return;
+            if (!currentUser || !database) return;
             
             try {
                 await database.ref(`users/${currentUser.uid}/isOnline`).set(isOnline);
@@ -1036,45 +848,9 @@
             }
         }
 
-        // Real-time Data Listeners
-        let listeners = [];
-
-        function setupRealtimeListeners() {
-            if (!currentUser) return;
-            
-            // Listen to user data changes
-            const userListener = database.ref(`users/${currentUser.uid}`).on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    userData = snapshot.val();
-                    updateUserInterface();
-                }
-            });
-            
-            // Listen to leaderboard changes
-            const leaderboardListener = database.ref('users').on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    leaderboardData = snapshot.val();
-                    updateLeaderboard();
-                    updateTeamStats();
-                }
-            });
-            
-            listeners.push(
-                { ref: `users/${currentUser.uid}`, listener: userListener },
-                { ref: 'users', listener: leaderboardListener }
-            );
-        }
-
-        function cleanupListeners() {
-            listeners.forEach(({ ref, listener }) => {
-                database.ref(ref).off('value', listener);
-            });
-            listeners = [];
-        }
-
-        // Check-in Functions
+        // Quick Check-in
         async function quickCheckIn(type) {
-            if (!currentUser) return;
+            if (!currentUser || !database) return;
             
             const today = new Date().toDateString();
             const checkInPath = `users/${currentUser.uid}/checkIns/${today}/${type}`;
@@ -1084,26 +860,19 @@
                 const isCheckedIn = snapshot.exists();
                 
                 if (isCheckedIn) {
-                    // Remove check-in
                     await database.ref(checkInPath).remove();
                     await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
                         return Math.max(0, (score || 0) - 10);
                     });
                     showNotification(`${type} check-in removed`, 'warning');
                 } else {
-                    // Add check-in
                     await database.ref(checkInPath).set(true);
                     await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
                         return (score || 0) + 10;
                     });
-                    
-                    // Update streak
-                    await updateStreak();
-                    
                     showNotification(`Great job! +10 points for ${type}! 🎉`, 'success');
                 }
                 
-                // Update last active
                 await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
                 
             } catch (error) {
@@ -1112,422 +881,36 @@
             }
         }
 
-        function updateCheckInButtons() {
-            if (!userData.checkIns) return;
-            
-            const today = new Date().toDateString();
-            const todayCheckIns = userData.checkIns[today] || {};
-            
-            ['workout', 'nutrition', 'sleep', 'hydration'].forEach(type => {
-                const button = document.querySelector(`[onclick="quickCheckIn('${type}')"]`);
-                if (button) {
-                    if (todayCheckIns[type]) {
-                        button.classList.add('active');
-                    } else {
-                        button.classList.remove('active');
-                    }
-                }
-            });
-        }
-
-        async function updateStreak() {
-            if (!currentUser) return;
-            
-            try {
-                const checkInsSnapshot = await database.ref(`users/${currentUser.uid}/checkIns`).once('value');
-                const checkInsData = checkInsSnapshot.val() || {};
-                
-                let currentStreak = 0;
-                const today = new Date();
-                
-                // Calculate streak by checking consecutive days
-                for (let i = 0; i <= 365; i++) {
-                    const checkDate = new Date(today);
-                    checkDate.setDate(checkDate.getDate() - i);
-                    const dateString = checkDate.toDateString();
-                    
-                    const dayCheckIns = checkInsData[dateString];
-                    if (dayCheckIns && Object.keys(dayCheckIns).length > 0) {
-                        currentStreak++;
-                    } else {
-                        break;
-                    }
-                }
-                
-                await database.ref(`users/${currentUser.uid}/streak`).set(currentStreak);
-                
-            } catch (error) {
-                console.error('Error updating streak:', error);
-            }
-        }
-
-        // Progress Tracking
-        async function saveProgress() {
-            if (!currentUser) return;
-            
-            const weight = parseFloat(document.getElementById('weightInput').value);
-            const bodyfat = parseFloat(document.getElementById('bodyfatInput').value);
-            const energy = parseInt(document.getElementById('energyInput').value);
-            const sleep = parseFloat(document.getElementById('sleepInput').value);
-            
-            if (!weight) {
-                showNotification('Please enter your weight', 'warning');
-                return;
-            }
-            
-            const progressEntry = {
-                date: new Date().toISOString(),
-                weight: weight,
-                bodyfat: bodyfat || null,
-                energy: energy || null,
-                sleep: sleep || null
-            };
-            
-            try {
-                await database.ref(`users/${currentUser.uid}/progressData`).push(progressEntry);
-                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
-                    return (score || 0) + 15;
-                });
-                await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
-                
-                showNotification('Progress saved! +15 points! 📊', 'success');
-                
-                // Clear form
-                document.getElementById('weightInput').value = '';
-                document.getElementById('bodyfatInput').value = '';
-                document.getElementById('energyInput').value = '';
-                document.getElementById('sleepInput').value = '';
-                
-                // Update charts
-                updateProgressCharts();
-                
-            } catch (error) {
-                console.error('Error saving progress:', error);
-                showNotification('Error saving progress', 'error');
-            }
-        }
-
-        // Leaderboard Functions
-        async function loadLeaderboard() {
-            try {
-                const snapshot = await database.ref('users').once('value');
-                if (snapshot.exists()) {
-                    leaderboardData = snapshot.val();
-                    updateLeaderboard();
-                    updateTeamStats();
-                }
-            } catch (error) {
-                console.error('Error loading leaderboard:', error);
-            }
-        }
-
-        function updateLeaderboard() {
-            const container = document.getElementById('leaderboardContainer');
-            if (!container || !leaderboardData) return;
-            
-            // Convert to array and sort by score
-            const users = Object.values(leaderboardData)
-                .filter(user => user.score !== undefined)
-                .sort((a, b) => (b.score || 0) - (a.score || 0));
-            
-            container.innerHTML = '';
-            
-            users.forEach((user, index) => {
-                const rank = index + 1;
-                const isCurrentUser = user.uid === currentUser?.uid;
-                
-                const item = document.createElement('div');
-                item.className = `leaderboard-item ${rank <= 3 ? `rank-${rank}` : ''}`;
-                
-                const avatar = user.photoURL ? 
-                    `<img src="${user.photoURL}" alt="${user.name}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` :
-                    `<div class="user-avatar" style="width: 50px; height: 50px; font-size: 1.2rem;">${(user.name || 'U').charAt(0).toUpperCase()}</div>`;
-                
-                const onlineStatus = user.isOnline ? 
-                    '<span style="color: #10b981; font-size: 0.8rem;">🟢 Online</span>' : '';
-                
-                item.innerHTML = `
-                    <div class="user-info">
-                        ${avatar}
-                        <div>
-                            <strong>${user.name || 'Unknown'}</strong>
-                            <div style="font-size: 0.9rem; opacity: 0.8;">${user.nickname || ''}</div>
-                            ${onlineStatus}
-                        </div>
-                    </div>
-                    <div class="user-stats">
-                        <div class="user-score">${user.score || 0}</div>
-                        <div class="user-streak">${user.streak || 0}-day streak</div>
-                    </div>
-                `;
-                
-                if (isCurrentUser) {
-                    item.style.borderColor = 'var(--primary-color)';
-                    item.style.backgroundColor = '#eff6ff';
-                    document.getElementById('userRank').textContent = rank;
-                }
-                
-                container.appendChild(item);
-            });
-            
-            // Update header with current leader
-            if (users.length > 0) {
-                document.getElementById('currentLeader').textContent = `Leader: ${users[0].name}`;
-            }
-        }
-
-        function updateTeamStats() {
-            if (!leaderboardData) return;
-            
-            const users = Object.values(leaderboardData);
-            const totalUsers = users.length;
-            
-            // Calculate team average
-            const totalScore = users.reduce((sum, user) => sum + (user.score || 0), 0);
-            const teamAverage = totalUsers > 0 ? Math.round(totalScore / totalUsers) : 0;
-            
-            // Calculate active today
-            const today = new Date().toDateString();
-            const activeToday = users.filter(user => {
-                const lastActive = new Date(user.lastActive || 0);
-                return lastActive.toDateString() === today;
-            }).length;
-            
-            document.getElementById('teamAverage').textContent = teamAverage;
-            document.getElementById('teamActive').textContent = activeToday;
-        }
-
-        // Social Features
-        async function createPost() {
-            const postText = document.getElementById('postInput').value.trim();
-            if (!postText || !currentUser) return;
-            
-            const post = {
-                id: Date.now().toString(),
-                authorId: currentUser.uid,
-                authorName: userData.name || 'Unknown',
-                authorPhoto: userData.photoURL || null,
-                text: postText,
-                timestamp: new Date().toISOString(),
-                likes: 0,
-                comments: []
-            };
-            
-            try {
-                await database.ref(`posts/${post.id}`).set(post);
-                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
-                    return (score || 0) + 5;
-                });
-                
-                document.getElementById('postInput').value = '';
-                showNotification('Post shared! +5 points! 📝', 'success');
-                
-                loadSocialFeed();
-                
-            } catch (error) {
-                console.error('Error creating post:', error);
-                showNotification('Error sharing post', 'error');
-            }
-        }
-
-        async function loadSocialFeed() {
-            try {
-                const snapshot = await database.ref('posts').orderByChild('timestamp').limitToLast(20).once('value');
-                const posts = [];
-                
-                snapshot.forEach((childSnapshot) => {
-                    posts.push(childSnapshot.val());
-                });
-                
-                posts.reverse(); // Show newest first
-                
-                const container = document.getElementById('feedContainer');
-                container.innerHTML = '';
-                
-                posts.forEach(post => {
-                    const postElement = document.createElement('div');
-                    postElement.style.cssText = `
-                        border: 1px solid var(--border-color);
-                        border-radius: var(--radius);
-                        padding: 16px;
-                        margin-bottom: 16px;
-                        background: var(--surface-color);
-                    `;
-                    
-                    const timeAgo = getTimeAgo(new Date(post.timestamp));
-                    const avatar = post.authorPhoto ? 
-                        `<img src="${post.authorPhoto}" alt="${post.authorName}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` :
-                        `<div class="user-avatar" style="width: 40px; height: 40px; font-size: 1rem;">${(post.authorName || 'U').charAt(0).toUpperCase()}</div>`;
-                    
-                    postElement.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            ${avatar}
-                            <div>
-                                <strong>${post.authorName}</strong>
-                                <div style="font-size: 0.8rem; color: var(--text-secondary);">${timeAgo}</div>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 12px; line-height: 1.6;">
-                            ${post.text}
-                        </div>
-                        <div style="display: flex; gap: 16px; font-size: 0.9rem; color: var(--text-secondary);">
-                            <span style="cursor: pointer;" onclick="likePost('${post.id}')">👍 Like (${post.likes || 0})</span>
-                            <span style="cursor: pointer;">💬 Comment</span>
-                        </div>
-                    `;
-                    
-                    container.appendChild(postElement);
-                });
-                
-            } catch (error) {
-                console.error('Error loading social feed:', error);
-            }
-        }
-
-        async function likePost(postId) {
-            try {
-                await database.ref(`posts/${postId}/likes`).transaction((likes) => {
-                    return (likes || 0) + 1;
-                });
-                showNotification('Liked! 👍', 'success');
-            } catch (error) {
-                console.error('Error liking post:', error);
-            }
-        }
-
-        // Analytics Functions
-        function updateConsistencyScore() {
-            if (!userData.checkIns) {
-                document.getElementById('consistencyScore').textContent = '0%';
-                return;
-            }
-            
-            const last30Days = [];
-            const today = new Date();
-            
-            for (let i = 0; i < 30; i++) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-                last30Days.push(date.toDateString());
-            }
-            
-            const activeDays = last30Days.filter(dateString => {
-                const dayCheckIns = userData.checkIns[dateString];
-                return dayCheckIns && Object.keys(dayCheckIns).length > 0;
-            }).length;
-            
-            const consistencyPercentage = Math.round((activeDays / 30) * 100);
-            document.getElementById('consistencyScore').textContent = consistencyPercentage + '%';
-        }
-
-        function updateProgressCharts() {
-            // Simple chart implementation using Canvas
-            // In a real app, you'd use a charting library like Chart.js
-            
-            if (!userData.progressData || userData.progressData.length === 0) return;
-            
-            const weightData = Object.values(userData.progressData)
-                .filter(entry => entry.weight)
-                .slice(-30); // Last 30 entries
-            
-            drawSimpleChart('weightChart', weightData.map(entry => entry.weight), 'Weight (kg)');
-        }
-
-        function drawSimpleChart(canvasId, data, label) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, width, height);
-            
-            if (data.length === 0) {
-                ctx.fillStyle = '#9ca3af';
-                ctx.font = '14px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText('No data available', width / 2, height / 2);
-                return;
-            }
-            
-            const max = Math.max(...data);
-            const min = Math.min(...data);
-            const range = max - min || 1;
-            
-            // Draw grid
-            ctx.strokeStyle = '#e5e7eb';
-            ctx.lineWidth = 1;
-            
-            for (let i = 0; i < 5; i++) {
-                const y = (height / 4) * i;
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
-            }
-            
-            // Draw line
-            ctx.strokeStyle = '#3b82f6';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
-            data.forEach((value, index) => {
-                const x = (width / (data.length - 1)) * index;
-                const y = height - ((value - min) / range) * height;
-                
-                if (index === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-            
-            ctx.stroke();
-            
-            // Draw points
-            ctx.fillStyle = '#3b82f6';
-            data.forEach((value, index) => {
-                const x = (width / (data.length - 1)) * index;
-                const y = height - ((value - min) / range) * height;
-                
-                ctx.beginPath();
-                ctx.arc(x, y, 3, 0, 2 * Math.PI);
-                ctx.fill();
-            });
-        }
-
         // Utility Functions
-        function getTimeAgo(date) {
-            const now = new Date();
-            const diffInSeconds = Math.floor((now - date) / 1000);
-            
-            if (diffInSeconds < 60) return 'Just now';
-            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-            return `${Math.floor(diffInSeconds / 86400)}d ago`;
+        function getErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    return 'No account found with this email';
+                case 'auth/wrong-password':
+                    return 'Incorrect password';
+                case 'auth/invalid-email':
+                    return 'Invalid email address';
+                case 'auth/email-already-in-use':
+                    return 'An account with this email already exists';
+                case 'auth/weak-password':
+                    return 'Password is too weak';
+                case 'auth/popup-closed-by-user':
+                    return 'Google sign-in was cancelled';
+                default:
+                    return error.message || 'An error occurred';
+            }
         }
 
         function showTab(tabName) {
-            // Update tab buttons
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             event.target.classList.add('active');
             
-            // Update tab content
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById(tabName).classList.add('active');
-            
-            // Load tab-specific data
-            if (tabName === 'social') {
-                loadSocialFeed();
-            } else if (tabName === 'progress') {
-                updateProgressCharts();
-            }
         }
 
         function showNotification(message, type = 'success') {
@@ -1540,10 +923,9 @@
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => notification.remove(), 300);
-            }, 3000);
+            }, 4000);
         }
 
-        // Global Progress Updates
         function updateGlobalProgress() {
             const startDate = new Date('2025-06-01');
             const endDate = new Date('2026-06-01');
@@ -1573,20 +955,30 @@
             }
         });
 
-        // Initialize the application
-        function initializeApp() {
-            if (initializeFirebase()) {
-                updateGlobalProgress();
-                
-                // Update global progress every hour
-                setInterval(updateGlobalProgress, 3600000);
-                
-                console.log('✅ FitSquad Pro initialized successfully');
-            } else {
-                showNotification('Firebase configuration required', 'error');
-            }
-        }
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            console.log('🚀 Starting FitSquad Pro...');
+            updateGlobalProgress();
+            
+            // Wait a bit for Firebase to load
+            setTimeout(() => {
+                if (initializeFirebase()) {
+                    console.log('✅ App initialized successfully');
+                } else {
+                    console.error('❌ App initialization failed');
+                }
+            }, 1000);
+        });
 
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
