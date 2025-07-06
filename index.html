@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitSquad Pro - 20K DH Challenge</title>
     
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+    <!-- Firebase SDKs v8 (more stable for basic projects) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -735,7 +734,8 @@
 
         function initializeFirebase() {
             try {
-                app = firebase.initializeApp(firebaseConfig);
+                // Initialize Firebase with v8 SDK
+                firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 database = firebase.database();
                 storage = firebase.storage();
@@ -796,12 +796,37 @@
                 return;
             }
 
+            if (!auth) {
+                showNotification('Firebase not initialized. Please refresh the page.', 'error');
+                return;
+            }
+
             try {
-                await auth.signInWithEmailAndPassword(email, password);
+                const result = await auth.signInWithEmailAndPassword(email, password);
                 showNotification('Welcome back! 🎉', 'success');
+                console.log('User signed in:', result.user.uid);
             } catch (error) {
                 console.error('Login error:', error);
-                showNotification(error.message, 'error');
+                let errorMessage = 'Login failed';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
             }
         }
 
@@ -818,6 +843,11 @@
 
             if (password.length < 6) {
                 showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (!auth) {
+                showNotification('Firebase not initialized. Please refresh the page.', 'error');
                 return;
             }
 
@@ -847,10 +877,27 @@
                 
                 await database.ref(`users/${user.uid}`).set(initialUserData);
                 showNotification('Account created successfully! 🎉', 'success');
+                console.log('User registered:', user.uid);
                 
             } catch (error) {
                 console.error('Registration error:', error);
-                showNotification(error.message, 'error');
+                let errorMessage = 'Registration failed';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'An account with this email already exists';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
             }
         }
 
@@ -890,7 +937,7 @@
                 
             } catch (error) {
                 console.error('Google sign-in error:', error);
-                showNotification(error.message, 'error');
+                showNotification('Google sign-in failed: ' + error.message, 'error');
             }
         }
 
