@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squad Fitness Challenge - 20K DH</title>
+    <title>Ultimate Squad Battle - 20K DH</title>
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
         * {
             margin: 0;
@@ -17,53 +22,207 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             color: #1e293b;
-            padding: 20px;
+            padding: 10px;
         }
 
-        .container {
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Login Styles */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 40px;
-            box-shadow: 
-                0 20px 25px -5px rgba(0, 0, 0, 0.1),
-                0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e2e8f0;
-            max-width: 600px;
-            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .profile-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-option {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .profile-option:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .profile-option.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .profile-avatar-login {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin: 0 auto 10px;
         }
 
         .header {
-            margin-bottom: 32px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
         }
 
-        .title {
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .main-title {
             font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .prize-banner {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-            letter-spacing: -0.025em;
+            display: inline-block;
+            margin-top: 10px;
         }
 
-        .subtitle {
-            font-size: 1.1rem;
-            color: #64748b;
-            font-weight: 400;
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            padding: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
         }
 
-        .progress-section {
-            margin: 40px 0;
+        .nav-tab {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .nav-tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #f1f5f9;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .progress-circle {
             position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 32px;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
         }
 
         .circle-bg {
@@ -87,592 +246,2020 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #3b82f6;
         }
 
-        .countdown-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin: 32px 0;
-        }
-
-        .countdown-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .countdown-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0f172a;
-            display: block;
-        }
-
-        .countdown-label {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin-top: 4px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .prize-section {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 2px solid #f59e0b;
+        .leaderboard {
+            background: white;
             border-radius: 20px;
-            padding: 32px;
-            margin: 32px 0;
-        }
-
-        .prize-amount {
-            font-size: 3rem;
-            font-weight: 800;
-            color: #92400e;
-            margin-bottom: 8px;
-        }
-
-        .prize-description {
-            font-size: 1.125rem;
-            color: #b45309;
-            font-weight: 500;
-        }
-
-        .competitors-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .competitor-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            font-weight: 600;
-            font-size: 1.125rem;
-            color: #1e293b;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .competitor-card:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-            transform: translateY(-2px);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
+            padding: 30px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .stat-number {
-            font-size: 2rem;
+        .leaderboard-title {
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #0f172a;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin-top: 8px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .motivation-section {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border: 2px solid #3b82f6;
-            border-radius: 20px;
-            padding: 32px;
-            margin: 32px 0;
-        }
-
-        .motivation-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e40af;
-            margin-bottom: 16px;
-        }
-
-        .motivation-text {
-            font-size: 1.125rem;
-            color: #1e40af;
-            font-weight: 500;
-            line-height: 1.6;
-        }
-
-        .insights-section {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 32px;
-            margin: 32px 0;
-        }
-
-        .insights-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 24px;
-        }
-
-        .insight-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .insight-row:last-child {
-            border-bottom: none;
-        }
-
-        .insight-label {
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .insight-value {
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .achievements-section {
-            margin: 40px 0;
-        }
-
-        .achievements-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 24px;
-        }
-
-        .achievement {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 24px;
-            margin: 12px 0;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .achievement.unlocked {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border-color: #10b981;
-        }
-
-        .achievement:hover {
-            transform: translateX(8px);
-        }
-
-        .achievement-text {
-            font-weight: 500;
-            color: #1e293b;
-        }
-
-        .achievement.unlocked .achievement-text {
-            color: #047857;
-            font-weight: 600;
-        }
-
-        .achievement-icon {
-            font-size: 1.5rem;
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding-top: 24px;
-            border-top: 1px solid #e2e8f0;
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .weather-widget {
-            background: #f1f5f9;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 20px 0;
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        .weather-emoji {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
+        .player-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .weather-text {
-            font-size: 0.875rem;
+        .player-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .player-card.rank-1 {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            border-color: #d97706;
+        }
+
+        .player-card.rank-2 {
+            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+            color: white;
+            border-color: #6b7280;
+        }
+
+        .player-card.rank-3 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-color: #b45309;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .player-stats {
+            text-align: right;
+        }
+
+        .player-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .player-streak {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .profile-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .progress-tracker {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
             color: #64748b;
+            margin-top: 5px;
+        }
+
+        .check-in-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .check-in-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .check-in-btn {
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .check-in-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .check-in-btn.checked {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .achievement-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-card.unlocked {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border-color: #10b981;
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .social-feed {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .post {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 0;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .ai-insights {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 2px solid #3b82f6;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .ai-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+
+        .challenge-card {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .challenge-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .streak-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .streak-day {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .streak-day.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .photo-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f3f4f6;
+        }
+
+        .motivation-quote {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-style: italic;
             font-weight: 500;
+            color: #92400e;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .firebase-status {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .data-management {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .data-btn {
+            display: block;
+            margin: 5px 0;
+            padding: 8px 12px;
+            background: #374151;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .data-btn:hover {
+            opacity: 1;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 24px;
-            }
-            
-            .title {
-                font-size: 2rem;
-            }
-            
-            .competitors-grid,
-            .stats-grid {
+            .dashboard-grid,
+            .profile-section {
                 grid-template-columns: 1fr;
             }
             
-            .countdown-grid {
+            .nav-tabs {
+                overflow-x: auto;
+            }
+            
+            .tracker-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .profile-selection {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">Squad Fitness Challenge</h1>
-            <p class="subtitle">Transformation 2025-2026 • <span class="badge">20 000 DH</span></p>
-        </div>
-        
-        <div class="progress-section">
-            <div class="progress-circle">
-                <svg width="200" height="200">
-                    <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-                    <circle class="circle-progress" cx="100" cy="100" r="90" id="progressCircle"></circle>
-                </svg>
-                <div class="percentage" id="percentage">0%</div>
-            </div>
-        </div>
-
-        <div class="countdown-grid">
-            <div class="countdown-card">
-                <span class="countdown-number" id="months">0</span>
-                <span class="countdown-label">Mois</span>
-            </div>
-            <div class="countdown-card">
-                <span class="countdown-number" id="days">0</span>
-                <span class="countdown-label">Jours</span>
-            </div>
-            <div class="countdown-card">
-                <span class="countdown-number" id="hours">0</span>
-                <span class="countdown-label">Heures</span>
-            </div>
-        </div>
-
-        <div class="prize-section">
-            <div class="prize-amount">20 000 DH</div>
-            <div class="prize-description">Lm9wd fina aydiha</div>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">🏆 SQUAD BATTLE</h1>
+            <p class="login-subtitle">Sélectionnez votre profil pour continuer</p>
             
-            <div class="competitors-grid">
-                <div class="competitor-card">🔥 MEHDI</div>
-                <div class="competitor-card">💪 ANASSE</div>
-                <div class="competitor-card">⚡ BENGRAM</div>
-                <div class="competitor-card">🚀 IMAD</div>
+            <div class="profile-selection">
+                <div class="profile-option" onclick="selectProfile('mehdi')">
+                    <div class="profile-avatar-login">🔥</div>
+                    <h3>MEHDI</h3>
+                    <p>The Beast</p>
+                </div>
+                
+                <div class="profile-option" onclick="selectProfile('anasse')">
+                    <div class="profile-avatar-login">💪</div>
+                    <h3>ANASSE</h3>
+                    <p>The Machine</p>
+                </div>
+                
+                <div class="profile-option" onclick="selectProfile('bengram')">
+                    <div class="profile-avatar-login">⚡</div>
+                    <h3>BENGRAM</h3>
+                    <p>The Lightning</p>
+                </div>
+                
+                <div class="profile-option" onclick="selectProfile('imad')">
+                    <div class="profile-avatar-login">🚀</div>
+                    <h3>IMAD</h3>
+                    <p>The Rocket</p>
+                </div>
+            </div>
+            
+            <button id="loginBtn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" disabled onclick="login()">
+                Entrer dans la bataille
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="app-container hidden">
+        <div class="header">
+            <div class="user-info">
+                <div class="current-user-avatar" id="currentUserAvatar">🔥</div>
+                <span id="currentUserName">MEHDI</span>
+                <button class="logout-btn" onclick="logout()">Déconnexion</button>
+            </div>
+            
+            <h1 class="main-title">🏆 ULTIMATE SQUAD BATTLE</h1>
+            <div class="prize-banner">💰 20,000 DH WINNER TAKES ALL</div>
+            <div style="margin-top: 15px; color: #64748b;">
+                <span id="globalProgress">9.6%</span> Complete • 
+                <span id="daysRemaining">330</span> days left • 
+                <span id="currentLeader">Mehdi</span> leading
             </div>
         </div>
 
-        <div class="motivation-section">
-            <div class="motivation-title">💪 Motivation du Jour</div>
-            <div class="motivation-text" id="dailyMotivation">
-                Loading motivation...
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">🏠 Dashboard</button>
+            <button class="nav-tab" onclick="showTab('profiles')">👥 Profiles</button>
+            <button class="nav-tab" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+            <button class="nav-tab" onclick="showTab('challenges')">⚡ Challenges</button>
+            <button class="nav-tab" onclick="showTab('social')">💬 Social</button>
+            <button class="nav-tab" onclick="showTab('ai')">🤖 AI Coach</button>
+        </div>
+
+        <!-- DASHBOARD TAB -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="progress-card">
+                    <h3>Global Progress</h3>
+                    <div class="progress-circle">
+                        <svg width="150" height="150">
+                            <circle class="circle-bg" cx="75" cy="75" r="65"></circle>
+                            <circle class="circle-progress" cx="75" cy="75" r="65" id="globalProgressCircle"></circle>
+                        </svg>
+                        <div class="percentage" id="globalPercentage">9.6%</div>
+                    </div>
+                    <p><strong>35</strong> days completed</p>
+                </div>
+
+                <div class="progress-card">
+                    <h3>Quick Check-In</h3>
+                    <div class="check-in-buttons">
+                        <button class="check-in-btn" onclick="quickCheckIn('workout')">
+                            💪 Workout Done
+                        </button>
+                        <button class="check-in-btn" onclick="quickCheckIn('nutrition')">
+                            🥗 Good Nutrition
+                        </button>
+                        <button class="check-in-btn" onclick="quickCheckIn('sleep')">
+                            😴 Good Sleep
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="motivation-quote" id="dailyMotivation">
+                "Today, you choose between 'I wish' and 'I will' - Choose wisely! 💪"
+            </div>
+
+            <div class="progress-tracker">
+                <h3>Today's Team Stats</h3>
+                <div class="tracker-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="workoutsCompleted">3/4</div>
+                        <div class="metric-label">Workouts Completed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="dietOnTrack">2/4</div>
+                        <div class="metric-label">Diet on Track</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="averageScore">67</div>
+                        <div class="metric-label">Average Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="teamStreak">12</div>
+                        <div class="metric-label">Team Streak</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-number" id="daysCompleted">0</span>
-                <span class="stat-label">Jours Écoulés</span>
+        <!-- PROFILES TAB -->
+        <div id="profiles" class="tab-content">
+            <div class="profile-section">
+                <div class="profile-card" onclick="switchToProfile('mehdi')">
+                    <div class="profile-avatar">🔥</div>
+                    <h3>MEHDI</h3>
+                    <p><strong>Score:</strong> <span id="mehdi-score">85</span>/100</p>
+                    <p><strong>Streak:</strong> <span id="mehdi-streak">12</span> days</p>
+                    <div class="streak-indicator">
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day">•</div>
+                        <div class="streak-day">•</div>
+                    </div>
+                </div>
+
+                <div class="profile-card" onclick="switchToProfile('anasse')">
+                    <div class="profile-avatar">💪</div>
+                    <h3>ANASSE</h3>
+                    <p><strong>Score:</strong> <span id="anasse-score">78</span>/100</p>
+                    <p><strong>Streak:</strong> <span id="anasse-streak">8</span> days</p>
+                    <div class="streak-indicator">
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day">✗</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day">•</div>
+                    </div>
+                </div>
+
+                <div class="profile-card" onclick="switchToProfile('bengram')">
+                    <div class="profile-avatar">⚡</div>
+                    <h3>BENGRAM</h3>
+                    <p><strong>Score:</strong> <span id="bengram-score">72</span>/100</p>
+                    <p><strong>Streak:</strong> <span id="bengram-streak">5</span> days</p>
+                    <div class="streak-indicator">
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day">✗</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day">•</div>
+                    </div>
+                </div>
+
+                <div class="profile-card" onclick="switchToProfile('imad')">
+                    <div class="profile-avatar">🚀</div>
+                    <h3>IMAD</h3>
+                    <p><strong>Score:</strong> <span id="imad-score">81</span>/100</p>
+                    <p><strong>Streak:</strong> <span id="imad-streak">10</span> days</p>
+                    <div class="streak-indicator">
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day completed">✓</div>
+                        <div class="streak-day">•</div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-number" id="daysRemaining">365</span>
-                <span class="stat-label">Jours Restants</span>
+
+            <!-- Individual Profile Details -->
+            <div class="progress-tracker">
+                <h3>📊 Detailed Tracking</h3>
+                <div class="input-group">
+                    <label>Today's Weight (kg)</label>
+                    <input type="number" id="weightInput" placeholder="Enter your weight">
+                </div>
+                <div class="input-group">
+                    <label>Body Fat % (optional)</label>
+                    <input type="number" id="bodyfatInput" placeholder="Enter body fat %">
+                </div>
+                <div class="input-group">
+                    <label>Energy Level (1-10)</label>
+                    <select id="energyInput">
+                        <option value="">Select energy level</option>
+                        <option value="1">1 - Exhausted</option>
+                        <option value="5">5 - Average</option>
+                        <option value="10">10 - Beast Mode</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveProgress()">Save Progress</button>
             </div>
-            <div class="stat-card">
-                <span class="stat-number" id="weekNumber">0</span>
-                <span class="stat-label">Semaine</span>
+
+            <!-- Photo Progress -->
+            <div class="progress-tracker">
+                <h3>📸 Photo Progress</h3>
+                <div class="photo-upload" onclick="uploadPhoto()">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
+                    <p>Click to upload progress photo</p>
+                    <p style="font-size: 0.9rem; color: #6b7280;">Before/After, gym selfies, meals, etc.</p>
+                </div>
+                <div class="photo-grid" id="photoGrid">
+                    <!-- Photos will be added here -->
+                </div>
             </div>
         </div>
 
-        <div class="insights-section">
-            <div class="insights-title">💡 Expert Fitness Tips</div>
-            <div class="insight-row">
-                <span class="insight-label">Build Muscle</span>
-                <span class="insight-value" id="muscleTip">Loading...</span>
+        <!-- LEADERBOARD TAB -->
+        <div id="leaderboard" class="tab-content">
+            <div class="leaderboard">
+                <h2 class="leaderboard-title">🏆 Live Rankings</h2>
+                <div id="leaderboardContainer">
+                    <!-- Leaderboard will be populated here -->
+                </div>
             </div>
-            <div class="insight-row">
-                <span class="insight-label">Burn Fat</span>
-                <span class="insight-value" id="fatTip">Loading...</span>
-            </div>
-            <div class="insight-row">
-                <span class="insight-label">Nutrition</span>
-                <span class="insight-value" id="nutritionTip">Loading...</span>
-            </div>
-            <div class="insight-row">
-                <span class="insight-label">Recovery</span>
-                <span class="insight-value" id="recoveryTip">Loading...</span>
+
+            <!-- Achievements -->
+            <div class="progress-tracker">
+                <h3>🏅 Squad Achievements</h3>
+                <div class="achievements-grid">
+                    <div class="achievement-card unlocked">
+                        <div class="achievement-icon">🔥</div>
+                        <h4>First Week Warriors</h4>
+                        <p>Complete first 7 days</p>
+                    </div>
+                    <div class="achievement-card unlocked">
+                        <div class="achievement-icon">💪</div>
+                        <h4>Team Spirit</h4>
+                        <p>All 4 members active same day</p>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="achievement-icon">⭐</div>
+                        <h4>25% Milestone</h4>
+                        <p>Reach 25% (17 Sept)</p>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="achievement-icon">🚀</div>
+                        <h4>No Excuses</h4>
+                        <p>30-day team streak</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="achievements-section">
-            <div class="achievements-title">🏆 Étapes</div>
-            <div class="achievement" id="achievement25">
-                <span class="achievement-text">25% - 17 Septembre 2025</span>
-                <span class="achievement-icon">⭐</span>
+        <!-- CHALLENGES TAB -->
+        <div id="challenges" class="tab-content">
+            <div class="progress-tracker">
+                <h3>⚡ Active Challenges</h3>
+                
+                <div class="challenge-card">
+                    <div class="challenge-title">💪 Weekly Workout Challenge</div>
+                    <p>Who can complete the most workouts this week?</p>
+                    <div style="margin: 15px 0;">
+                        <strong>Current Leader:</strong> Mehdi (5/7 workouts)
+                    </div>
+                    <div style="font-size: 0.9rem; color: #6b7280;">Ends: Sunday 11:59 PM</div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">🥗 Nutrition Consistency</div>
+                    <p>Stay on track with your diet for 7 consecutive days</p>
+                    <div style="margin: 15px 0;">
+                        <strong>Progress:</strong> 3/7 days completed
+                    </div>
+                    <div style="font-size: 0.9rem; color: #6b7280;">Reward: Bonus 50 XP</div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-title">📸 Progress Photo Challenge</div>
+                    <p>Upload your best transformation photo this month</p>
+                    <div style="margin: 15px 0;">
+                        <strong>Participants:</strong> 2/4 submitted
+                    </div>
+                    <button class="btn btn-primary" onclick="uploadChallengePhoto()">Submit Photo</button>
+                </div>
             </div>
-            <div class="achievement" id="achievement50">
-                <span class="achievement-text">50% - 2 Décembre 2025</span>
-                <span class="achievement-icon">🔥</span>
-            </div>
-            <div class="achievement" id="achievement75">
-                <span class="achievement-text">75% - 15 Février 2026</span>
-                <span class="achievement-icon">💪</span>
-            </div>
-            <div class="achievement" id="achievement90">
-                <span class="achievement-text">90% - 4 Mai 2026</span>
-                <span class="achievement-icon">🚀</span>
+
+            <div class="progress-tracker">
+                <h3>🎯 Create New Challenge</h3>
+                <div class="input-group">
+                    <label>Challenge Title</label>
+                    <input type="text" id="challengeTitle" placeholder="e.g. 10K Steps Daily Challenge">
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea id="challengeDesc" rows="3" placeholder="Describe the challenge..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Duration</label>
+                    <select id="challengeDuration">
+                        <option>1 Week</option>
+                        <option>2 Weeks</option>
+                        <option>1 Month</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" onclick="createChallenge()">Create Challenge</button>
             </div>
         </div>
 
-        <div class="weather-widget">
-            <div class="weather-emoji">🌤️</div>
-            <div class="weather-text" id="weatherMotivation">Perfect day to crush your goals!</div>
+        <!-- SOCIAL TAB -->
+        <div id="social" class="tab-content">
+            <div class="social-feed">
+                <h3>💬 Squad Feed</h3>
+                
+                <!-- Post Input -->
+                <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;">
+                    <div class="input-group">
+                        <textarea id="postInput" rows="3" placeholder="Share your progress, motivation, or struggles..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-primary" onclick="createPost()">📝 Post</button>
+                        <button class="btn" onclick="addPhoto()" style="background: #10b981; color: white;">📷 Photo</button>
+                        <button class="btn" onclick="shareWorkout()" style="background: #f59e0b; color: white;">💪 Workout</button>
+                    </div>
+                </div>
+
+                <!-- Posts Container -->
+                <div id="postsContainer">
+                    <!-- Posts will be populated from Firebase -->
+                </div>
+            </div>
+
+            <!-- Accountability Section -->
+            <div class="progress-tracker">
+                <h3>🎯 Accountability Check</h3>
+                <p style="margin-bottom: 20px;">Call out your squad members (friendly pressure!)</p>
+                
+                <div id="accountabilityContainer">
+                    <!-- Will be populated based on user activity -->
+                </div>
+            </div>
         </div>
 
-        <div class="footer">
-            Dernière mise à jour: <span id="updateTime">Loading...</span>
+        <!-- AI COACH TAB -->
+        <div id="ai" class="tab-content">
+            <div class="ai-insights">
+                <div class="ai-title">
+                    🤖 AI Coach Analysis
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4>📊 Performance Analysis</h4>
+                    <p style="margin: 10px 0;">Based on your squad data, here's what I see:</p>
+                    <div id="aiAnalysis">
+                        <p>Loading analysis...</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4>🎯 Weekly Predictions</h4>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 10px;">
+                        <p><strong>Win Probability (Based on current trends):</strong></p>
+                        <div id="winProbability" style="margin: 10px 0;">
+                            Loading predictions...
+                        </div>
+                        <p style="font-size: 0.9rem; color: #6b7280;">*Predictions based on consistency, progress rate, and momentum</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4>💡 Smart Recommendations</h4>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin-top: 10px;">
+                        <p><strong>This Week's Focus:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li>Add 15min cardio after weights (all squad)</li>
+                            <li>Increase protein to 2g per kg bodyweight</li>
+                            <li>Track sleep quality for better recovery</li>
+                            <li>Weekly progress photos for motivation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat -->
+            <div class="progress-tracker">
+                <h3>💬 Chat with AI Coach</h3>
+                <div id="chatMessages" style="height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; background: #f8fafc; margin-bottom: 15px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong>AI Coach:</strong> Hey squad! How can I help you optimize your training today? Ask me about nutrition, workouts, or motivation strategies! 🤖💪
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="chatInput" placeholder="Ask me anything about fitness, nutrition, or motivation..." style="flex: 1; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                    <button class="btn btn-primary" onclick="sendAIMessage()">Send</button>
+                </div>
+                
+                <!-- Quick Questions -->
+                <div style="margin-top: 15px;">
+                    <p style="font-weight: 600; margin-bottom: 10px;">Quick Questions:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <button class="btn" onclick="askAI('How can I break my plateau?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Break Plateau?</button>
+                        <button class="btn" onclick="askAI('Best post-workout meal?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Post-workout meal?</button>
+                        <button class="btn" onclick="askAI('How to stay motivated?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Stay motivated?</button>
+                        <button class="btn" onclick="askAI('Optimal rest time?')" style="background: #f3f4f6; color: #374151; font-size: 0.9rem;">Rest between sets?</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Challenges from AI -->
+            <div class="progress-tracker">
+                <h3>🎯 AI-Generated Challenges</h3>
+                <div class="challenge-card">
+                    <div class="challenge-title">🧠 Smart Challenge: Plateau Breaker</div>
+                    <p>AI detected potential plateau. Try this new approach:</p>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Increase reps by 2 for all exercises</li>
+                        <li>Add 5min HIIT after each workout</li>
+                        <li>Track energy levels for 7 days</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="acceptAIChallenge()">Accept Challenge</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Daily motivations database
-        const dailyMotivations = [
-            "Aujourd'hui, tu choisis entre 'I wish' et 'I will' - Choose wisely!",
-            "Les muscles se construisent dans la douleur, les champions dans la constance!",
-            "Chaque rep aujourd'hui = un pas vers les 20K! Make it count!",
-            "Your only competition? The person you were yesterday! Beat him!",
-            "Pain is temporary, but quitting lasts forever! Keep pushing!",
-            "Les excuses brûlent zéro calories - Hit the gym instead!",
-            "Success starts with self-discipline - Show yourself who's boss!",
-            "Every workout is a deposit in your future self's bank account!",
-            "Champions don't become champions in the ring - They're made in training!",
-            "La différence entre ordinary et extraordinary? That extra! Give it!",
-            "Your body can stand almost anything - It's your mind you need to convince!",
-            "Motivation gets you started, habit keeps you going! Build that habit!",
-            "Le 1% d'amélioration daily = 37x better in a year! Compound it!",
-            "Discipline is choosing between what you want now vs what you want most!",
-            "Every no to junk food is a yes to your future physique! Choose wisely!",
-            "Les lions don't lose sleep over the opinions of sheep! Stay focused!",
-            "Progress not perfection - Every small step counts towards 20K!",
-            "Your why has to be stronger than your excuses! Remember your why!",
-            "Champions train when they don't feel like it - That's what makes them champions!",
-            "If it doesn't challenge you, it won't change you! Embrace the challenge!",
-            "Success is the sum of small efforts repeated daily! Keep summing!",
-            "The best project you'll ever work on is YOU! Invest in yourself!",
-            "Consistency beats perfection every single time! Stay consistent!",
-            "Your future self is watching - Make them proud today!",
-            "Every champion was once a beginner who refused to give up! Keep going!",
-            "Strong doesn't mean just muscles - It means mental toughness! Build both!",
-            "The gym is your laboratory - Experiment with greatness!",
-            "Sweat is just fat crying - Make it weep today!",
-            "Your only limit is you - And you're limitless! Break barriers!",
-            "Excellence is not an act but a habit - Make it habitual!"
-        ];
+        // Firebase Configuration - Updated with your actual config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYXcm6oJNsTLnRyLB8hv7tmOCX6QOFTyw",
+            authDomain: "fitness-tracker-eff06.firebaseapp.com",
+            databaseURL: "https://fitness-tracker-eff06-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "fitness-tracker-eff06",
+            storageBucket: "fitness-tracker-eff06.firebasestorage.app",
+            messagingSenderId: "560968111406",
+            appId: "1:560968111406:web:4544427ef3464cde3896bf",
+            measurementId: "G-QCVWJM25GF"
+        };
 
-        // Expert fitness tips
-        const muscleTips = [
-            "Progressive overload every 2 weeks",
-            "8-12 reps for hypertrophy",
-            "Compound movements first",
-            "3-4 sets per exercise",
-            "2-3 minutes rest between sets",
-            "Train each muscle 2x per week",
-            "Focus on eccentric control",
-            "Full range of motion",
-            "Mind-muscle connection",
-            "Track your lifts"
-        ];
+        // Initialize Firebase
+        let isFirebaseConnected = false;
+        let database = null;
+        let firebaseListeners = [];
 
-        const fatTips = [
-            "Deficit of 300-500 calories",
-            "HIIT 3x per week",
-            "Walk 10,000 steps daily",
-            "Cardio after weights",
-            "Intermittent fasting 16:8",
-            "Eat protein at every meal",
-            "Drink 3-4L water daily",
-            "Sleep 7-9 hours",
-            "Reduce refined carbs",
-            "Measure body fat, not just weight"
-        ];
-
-        const nutritionTips = [
-            "1.6-2.2g protein per kg bodyweight",
-            "Eat vegetables with every meal",
-            "Time carbs around workouts",
-            "Healthy fats 20-30% of calories",
-            "Meal prep on Sundays",
-            "Avoid liquid calories",
-            "Eat whole foods 80% of time",
-            "Post-workout protein within 30min",
-            "Don't skip breakfast",
-            "Track macros, not just calories"
-        ];
-
-        const recoveryTips = [
-            "Sleep is when muscles grow",
-            "Take 1-2 rest days per week",
-            "Active recovery: light walking",
-            "Stretch for 10min daily",
-            "Massage or foam rolling",
-            "Manage stress levels",
-            "Stay consistent, not perfect",
-            "Listen to your body",
-            "Hydrate immediately after training",
-            "Get sunlight in the morning"
-        ];
-
-        function getRandomTip(tipsArray) {
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-            return tipsArray[dayOfYear % tipsArray.length];
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            isFirebaseConnected = true;
+            console.log('🔥 Firebase connected successfully!');
+        } catch (error) {
+            console.warn('⚠️ Firebase not configured properly:', error);
+            isFirebaseConnected = false;
         }
 
-        // Weather-based motivation
-        function getWeatherMotivation() {
-            const motivations = [
-                "Perfect day for crushing goals!",
-                "Weather can't stop the grind!",
-                "Every day is gym day!",
-                "Focus on your gains, not the weather!",
-                "Consistency beats conditions!"
-            ];
-            return motivations[Math.floor(Math.random() * motivations.length)];
+        // Global data storage
+        let squadData = {
+            mehdi: { 
+                name: 'MEHDI', 
+                nickname: 'The Beast', 
+                emoji: '🔥', 
+                score: 85, 
+                streak: 12, 
+                workouts: [], 
+                weight: [], 
+                photos: [], 
+                checkIns: {},
+                lastActive: new Date().toISOString(),
+                isOnline: false
+            },
+            anasse: { 
+                name: 'ANASSE', 
+                nickname: 'The Machine', 
+                emoji: '💪', 
+                score: 78, 
+                streak: 8, 
+                workouts: [], 
+                weight: [], 
+                photos: [], 
+                checkIns: {},
+                lastActive: new Date().toISOString(),
+                isOnline: false
+            },
+            bengram: { 
+                name: 'BENGRAM', 
+                nickname: 'The Lightning', 
+                emoji: '⚡', 
+                score: 72, 
+                streak: 5, 
+                workouts: [], 
+                weight: [], 
+                photos: [], 
+                checkIns: {},
+                lastActive: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                isOnline: false
+            },
+            imad: { 
+                name: 'IMAD', 
+                nickname: 'The Rocket', 
+                emoji: '🚀', 
+                score: 81, 
+                streak: 10, 
+                workouts: [], 
+                weight: [], 
+                photos: [], 
+                checkIns: {},
+                lastActive: new Date().toISOString(),
+                isOnline: false
+            }
+        };
+
+        let currentUser = null;
+        let selectedProfile = null;
+        let posts = [];
+        let aiMessages = [];
+
+        // Firebase functions
+        function saveToFirebase(path, data) {
+            if (!isFirebaseConnected) {
+                showNotification('⚠️ Firebase not connected!', 'warning');
+                return Promise.resolve();
+            }
+
+            return database.ref(path).set(data)
+                .then(() => {
+                    console.log(`🔥 Data saved to Firebase: ${path}`);
+                    showNotification('☁️ Synced to cloud!', 'success');
+                })
+                .catch((error) => {
+                    console.error('🔥 Firebase save error:', error);
+                    showNotification('❌ Failed to sync to cloud!', 'error');
+                });
         }
 
-        function updateProgress() {
-            const startDate = new Date('2025-06-01');
-            const endDate = new Date('2026-06-01');
-            const currentDate = new Date();
-            
-            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-            const completedDays = Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24));
-            const remainingDays = totalDays - completedDays;
-            const percentage = Math.max(0, Math.min(100, (completedDays / totalDays) * 100));
-            
-            // Calculate remaining time
-            const timeRemaining = endDate - currentDate;
-            const months = Math.floor(timeRemaining / (1000 * 60 * 60 * 24 * 30));
-            const days = Math.floor((timeRemaining % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            
-            // Update displays
-            document.getElementById('percentage').textContent = percentage.toFixed(1) + '%';
-            document.getElementById('daysCompleted').textContent = Math.max(0, completedDays);
-            document.getElementById('daysRemaining').textContent = Math.max(0, remainingDays);
-            document.getElementById('weekNumber').textContent = Math.ceil(completedDays / 7);
-            
-            // Update countdown
-            document.getElementById('months').textContent = Math.max(0, months);
-            document.getElementById('days').textContent = Math.max(0, days);
-            document.getElementById('hours').textContent = Math.max(0, hours);
+        function loadFromFirebase() {
+            if (!isFirebaseConnected) {
+                showNotification('⚠️ Firebase not connected - using default data', 'warning');
+                return;
+            }
 
-            // Update progress circle
-            const circumference = 2 * Math.PI * 90;
-            const progressCircle = document.getElementById('progressCircle');
-            const strokeDashoffset = circumference - (percentage / 100) * circumference;
-            progressCircle.style.strokeDasharray = circumference;
-            progressCircle.style.strokeDashoffset = strokeDashoffset;
+            // Load squad data
+            database.ref('squadData').once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const firebaseData = snapshot.val();
+                        // Merge with default data to ensure all properties exist
+                        Object.keys(squadData).forEach(user => {
+                            if (firebaseData[user]) {
+                                squadData[user] = { ...squadData[user], ...firebaseData[user] };
+                            }
+                        });
+                        updateDisplays();
+                        console.log('✅ Squad data loaded from Firebase');
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ Failed to load squad data:', error);
+                });
 
-            // Daily motivation (changes every day)
-            const dayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-            const motivationIndex = dayOfYear % dailyMotivations.length;
-            document.getElementById('dailyMotivation').textContent = dailyMotivations[motivationIndex];
-
-            // Expert fitness tips (change daily)
-            document.getElementById('muscleTip').textContent = getRandomTip(muscleTips);
-            document.getElementById('fatTip').textContent = getRandomTip(fatTips);
-            document.getElementById('nutritionTip').textContent = getRandomTip(nutritionTips);
-            document.getElementById('recoveryTip').textContent = getRandomTip(recoveryTips);
-            
-            // Weather motivation
-            document.getElementById('weatherMotivation').textContent = getWeatherMotivation();
-
-            // Update achievements
-            updateAchievement('achievement25', percentage >= 25);
-            updateAchievement('achievement50', percentage >= 50);
-            updateAchievement('achievement75', percentage >= 75);
-            updateAchievement('achievement90', percentage >= 90);
-
-            // Update timestamp
-            document.getElementById('updateTime').textContent = 
-                currentDate.toLocaleDateString('fr-FR') + ' à ' + currentDate.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+            // Load posts
+            database.ref('posts').once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const firebasePosts = snapshot.val();
+                        posts = Object.values(firebasePosts).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        updateSocialFeedFromData();
+                        console.log('✅ Posts loaded from Firebase');
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ Failed to load posts:', error);
+                });
         }
 
-        function updateAchievement(id, unlocked) {
-            const achievement = document.getElementById(id);
-            if (unlocked) {
-                achievement.classList.add('unlocked');
-            } else {
-                achievement.classList.remove('unlocked');
+        function setupFirebaseListeners() {
+            if (!isFirebaseConnected) return;
+
+            // Listen for squad data changes
+            const squadListener = database.ref('squadData').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const firebaseData = snapshot.val();
+                    Object.keys(squadData).forEach(user => {
+                        if (firebaseData[user]) {
+                            squadData[user] = { ...squadData[user], ...firebaseData[user] };
+                        }
+                    });
+                    updateDisplays();
+                    updateLeaderboard();
+                    updateAccountabilityCheck();
+                }
+            });
+
+            // Listen for new posts
+            const postsListener = database.ref('posts').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const firebasePosts = snapshot.val();
+                    posts = Object.values(firebasePosts).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    updateSocialFeedFromData();
+                }
+            });
+
+            firebaseListeners.push(
+                { ref: 'squadData', listener: squadListener },
+                { ref: 'posts', listener: postsListener }
+            );
+        }
+
+        function setUserOnline(userId, isOnline) {
+            if (!isFirebaseConnected) return;
+
+            squadData[userId].isOnline = isOnline;
+            if (isOnline) {
+                squadData[userId].lastActive = new Date().toISOString();
+            }
+
+            database.ref(`squadData/${userId}/isOnline`).set(isOnline);
+            database.ref(`squadData/${userId}/lastActive`).set(squadData[userId].lastActive);
+        }
+
+        // Login functionality
+        function selectProfile(profileId) {
+            document.querySelectorAll('.profile-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            event.target.closest('.profile-option').classList.add('selected');
+            selectedProfile = profileId;
+            document.getElementById('loginBtn').disabled = false;
+        }
+
+        function login() {
+            if (selectedProfile) {
+                currentUser = selectedProfile;
+                
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                updateCurrentUserDisplay();
+                setUserOnline(currentUser, true);
+                squadData[currentUser].lastActive = new Date().toISOString();
+                
+                if (isFirebaseConnected) {
+                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+                    setupFirebaseListeners();
+                }
+                
+                loadUserData();
+                showNotification(`Bienvenue ${squadData[currentUser].name}! 🎉`, 'success');
             }
         }
 
-        // Initialize
-        updateProgress();
-        
-        // Update every hour
-        setInterval(updateProgress, 3600000);
-        
-        // Add click interactions
-        document.querySelectorAll('.competitor-card').forEach(card => {
-            card.addEventListener('click', () => {
-                card.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    card.style.transform = '';
-                }, 150);
+        function logout() {
+            if (currentUser) {
+                setUserOnline(currentUser, false);
+                
+                firebaseListeners.forEach(({ ref, listener }) => {
+                    if (isFirebaseConnected) {
+                        database.ref(ref).off('value', listener);
+                    }
+                });
+                firebaseListeners = [];
+            }
+            
+            currentUser = null;
+            selectedProfile = null;
+            
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            
+            document.querySelectorAll('.profile-option').forEach(option => {
+                option.classList.remove('selected');
             });
+            document.getElementById('loginBtn').disabled = true;
+            
+            showNotification('Déconnecté avec succès! 👋', 'info');
+        }
+
+        function updateCurrentUserDisplay() {
+            const userData = squadData[currentUser];
+            document.getElementById('currentUserAvatar').textContent = userData.emoji;
+            document.getElementById('currentUserName').textContent = userData.name;
+        }
+
+        function loadUserData() {
+            updateDashboardStats();
+            updateProfileScores();
+            updateLeaderboard();
+            updateAccountabilityCheck();
+            updateAIAnalysis();
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Quick check-in functionality
+        function quickCheckIn(type) {
+            const button = event.target;
+            const today = new Date().toDateString();
+            
+            if (!squadData[currentUser].checkIns[today]) {
+                squadData[currentUser].checkIns[today] = {};
+            }
+            
+            if (squadData[currentUser].checkIns[today][type]) {
+                delete squadData[currentUser].checkIns[today][type];
+                button.classList.remove('checked');
+                button.textContent = button.textContent.replace(' ✓', '');
+                squadData[currentUser].score = Math.max(0, squadData[currentUser].score - 5);
+            } else {
+                squadData[currentUser].checkIns[today][type] = true;
+                button.classList.add('checked');
+                button.textContent += ' ✓';
+                squadData[currentUser].score += 5;
+                squadData[currentUser].lastActive = new Date().toISOString();
+                updateStreak();
+                showNotification(`Great job! +5 points for ${type}! 🎉`, 'success');
+            }
+            
+            if (isFirebaseConnected) {
+                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+            }
+            updateDisplays();
+        }
+
+        function updateStreak() {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            const todayStr = today.toDateString();
+            const yesterdayStr = yesterday.toDateString();
+            
+            const todayCheckIns = squadData[currentUser].checkIns[todayStr];
+            const yesterdayCheckIns = squadData[currentUser].checkIns[yesterdayStr];
+            
+            if (todayCheckIns && Object.keys(todayCheckIns).length > 0) {
+                if (yesterdayCheckIns && Object.keys(yesterdayCheckIns).length > 0) {
+                    squadData[currentUser].streak++;
+                } else {
+                    squadData[currentUser].streak = 1;
+                }
+            }
+        }
+
+        // Progress tracking
+        function saveProgress() {
+            const weight = document.getElementById('weightInput').value;
+            const bodyfat = document.getElementById('bodyfatInput').value;
+            const energy = document.getElementById('energyInput').value;
+            
+            if (weight) {
+                const progressEntry = {
+                    date: new Date().toISOString(),
+                    weight: parseFloat(weight),
+                    bodyfat: bodyfat ? parseFloat(bodyfat) : null,
+                    energy: energy ? parseInt(energy) : null
+                };
+                
+                squadData[currentUser].weight.push(progressEntry);
+                squadData[currentUser].score += 3;
+                squadData[currentUser].lastActive = new Date().toISOString();
+                
+                showNotification('Progress saved! +3 points! 📊', 'success');
+                
+                document.getElementById('weightInput').value = '';
+                document.getElementById('bodyfatInput').value = '';
+                document.getElementById('energyInput').value = '';
+                
+                if (isFirebaseConnected) {
+                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+                }
+                updateDisplays();
+            } else {
+                showNotification('Please enter your weight first! ⚠️', 'warning');
+            }
+        }
+
+        function uploadPhoto() {
+            const photoGrid = document.getElementById('photoGrid');
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-item';
+            photoItem.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #e5e7eb; color: #6b7280;">
+                    📷 Photo ${photoGrid.children.length + 1}
+                </div>
+            `;
+            photoGrid.appendChild(photoItem);
+            
+            squadData[currentUser].photos.push({
+                date: new Date().toISOString(),
+                id: Date.now()
+            });
+            
+            squadData[currentUser].score += 10;
+            squadData[currentUser].lastActive = new Date().toISOString();
+            
+            showNotification('Photo uploaded! +10 points! 📸', 'success');
+            
+            if (isFirebaseConnected) {
+                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+            }
+            updateDisplays();
+        }
+
+        // Social features
+        function createPost() {
+            const postText = document.getElementById('postInput').value;
+            if (postText.trim()) {
+                const newPost = {
+                    id: Date.now(),
+                    author: currentUser,
+                    authorName: squadData[currentUser].name,
+                    authorEmoji: squadData[currentUser].emoji,
+                    text: postText,
+                    timestamp: new Date().toISOString(),
+                    likes: 0,
+                    comments: []
+                };
+                
+                if (isFirebaseConnected) {
+                    database.ref(`posts/${newPost.id}`).set(newPost);
+                } else {
+                    posts.unshift(newPost);
+                    updateSocialFeedFromData();
+                }
+                
+                document.getElementById('postInput').value = '';
+                squadData[currentUser].score += 2;
+                squadData[currentUser].lastActive = new Date().toISOString();
+                
+                showNotification('Post shared with the squad! +2 points! 📝', 'success');
+                
+                if (isFirebaseConnected) {
+                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+                }
+                updateDisplays();
+            }
+        }
+
+        function updateSocialFeedFromData() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+            
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                
+                const timeAgo = getTimeAgo(new Date(post.timestamp));
+                
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${post.authorEmoji}</div>
+                        <div>
+                            <strong>${post.authorName}</strong>
+                            <div style="font-size: 0.9rem; color: #6b7280;">${timeAgo}</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        ${post.text}
+                    </div>
+                    <div style="display: flex; gap: 15px; font-size: 0.9rem; color: #6b7280;">
+                        <span onclick="likePost(${post.id})" style="cursor: pointer;">👍 Like (${post.likes})</span>
+                        <span onclick="commentPost(${post.id})" style="cursor: pointer;">💬 Comment</span>
+                        <span onclick="motivatePost(${post.id})" style="cursor: pointer;">🔥 Motivate</span>
+                    </div>
+                `;
+                container.appendChild(postElement);
+            });
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            return `${Math.floor(diffInSeconds / 86400)}d ago`;
+        }
+
+        // Leaderboard
+        function updateLeaderboard() {
+            const container = document.getElementById('leaderboardContainer');
+            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
+            
+            container.innerHTML = '';
+            
+            sortedUsers.forEach(([userId, userData], index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+                
+                const playerCard = document.createElement('div');
+                playerCard.className = `player-card ${rankClass}`;
+                
+                playerCard.innerHTML = `
+                    <div class="player-info">
+                        <div class="player-avatar">${userData.emoji}</div>
+                        <div>
+                            <h3>${userData.name}</h3>
+                            <p>${userData.nickname}</p>
+                            ${userData.isOnline ? '<div style="font-size: 0.8rem; color: #10b981;">🟢 Online</div>' : ''}
+                        </div>
+                    </div>
+                    <div class="player-stats">
+                        <div class="player-score">${userData.score}</div>
+                        <div class="player-streak">${userData.streak}-day streak</div>
+                    </div>
+                `;
+                
+                container.appendChild(playerCard);
+            });
+        }
+
+        // Accountability check
+        function updateAccountabilityCheck() {
+            const container = document.getElementById('accountabilityContainer');
+            container.innerHTML = '';
+            
+            Object.entries(squadData).forEach(([userId, userData]) => {
+                if (userId === currentUser) return;
+                
+                const lastActive = new Date(userData.lastActive);
+                const daysSinceActive = Math.floor((new Date() - lastActive) / (1000 * 60 * 60 * 24));
+                
+                const cardColor = daysSinceActive > 1 ? '#fef3c7' : '#d1fae5';
+                const textColor = daysSinceActive > 1 ? '#92400e' : '#047857';
+                const buttonColor = daysSinceActive > 1 ? '#f59e0b' : '#10b981';
+                
+                const accountabilityCard = document.createElement('div');
+                accountabilityCard.style.cssText = `
+                    text-align: center; 
+                    padding: 20px; 
+                    background: ${cardColor}; 
+                    border-radius: 12px; 
+                    margin: 10px;
+                    display: inline-block;
+                    min-width: 200px;
+                `;
+                
+                accountabilityCard.innerHTML = `
+                    <div style="font-size: 2rem; margin-bottom: 10px;">${userData.emoji}</div>
+                    <strong>${userData.name}</strong>
+                    <div style="font-size: 0.9rem; color: ${textColor}; margin-top: 5px;">
+                        ${daysSinceActive > 1 ? `Last active: ${daysSinceActive} days ago` : 'Active today! 💪'}
+                    </div>
+                    <button class="btn" onclick="sendMotivation('${userId}')" style="margin-top: 10px; background: ${buttonColor}; color: white; font-size: 0.9rem;">
+                        ${daysSinceActive > 1 ? '🔥 Motivate' : '👍 Encourage'}
+                    </button>
+                `;
+                
+                container.appendChild(accountabilityCard);
+            });
+        }
+
+        // AI features
+        function updateAIAnalysis() {
+            const analysisContainer = document.getElementById('aiAnalysis');
+            const users = Object.values(squadData);
+            
+            analysisContainer.innerHTML = `
+                <ul style="margin-left: 20px; line-height: 1.6;">
+                    <li><strong>Mehdi:</strong> Excellent consistency! Your workout frequency is 94%. Consider adding more cardio for optimal fat loss.</li>
+                    <li><strong>Imad:</strong> Strong nutrition game! Your meal consistency is impressive. Focus on progressive overload in the gym.</li>
+                    <li><strong>Anasse:</strong> Good momentum building. Your energy levels correlate with sleep quality - prioritize 8+ hours.</li>
+                    <li><strong>Bengram:</strong> Potential detected! You respond well to challenges. Set micro-goals for better consistency.</li>
+                </ul>
+            `;
+            
+            // Update win probability
+            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
+            const total = sortedUsers.reduce((sum, [_, data]) => sum + data.score, 0);
+            
+            const probabilities = sortedUsers.map(([userId, data]) => {
+                const probability = Math.round((data.score / total) * 100);
+                return `${data.emoji} ${data.name}: ${probability}%`;
+            });
+            
+            document.getElementById('winProbability').textContent = probabilities.join(' | ');
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addAIMessage('user', message);
+                input.value = '';
+                
+                setTimeout(() => {
+                    const response = generateAIResponse(message);
+                    addAIMessage('ai', response);
+                }, 1000);
+            }
+        }
+
+        function askAI(question) {
+            document.getElementById('chatInput').value = question;
+            sendAIMessage();
+        }
+
+        function addAIMessage(sender, message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.marginBottom = '15px';
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `<strong>${squadData[currentUser].name}:</strong> ${message}`;
+            } else {
+                messageDiv.innerHTML = `<strong>AI Coach:</strong> ${message}`;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateAIResponse(message) {
+            const responses = {
+                'plateau': `Hey ${squadData[currentUser].name}! To break a plateau, try: 1) Change rep ranges 2) Add new exercises 3) Increase training frequency 4) Adjust nutrition timing. Your body adapts quickly - keep it guessing! 💪`,
+                'meal': `Perfect question ${squadData[currentUser].name}! Best post-workout meal: Protein + Carbs within 30min. Try: Chicken + rice, Greek yogurt + banana, or protein shake + oats. Aim for 20-30g protein! 🥗`,
+                'motivation': `${squadData[currentUser].name}, motivation tips: 1) Remember your WHY 2) Track small wins 3) Find an accountability partner 4) Celebrate progress 5) Focus on the process, not just results! You're currently rank ${getCurrentRank()} - keep pushing! 🔥`,
+                'rest': `Great question! Optimal rest: 2-3 minutes for compound exercises, 1-2 minutes for isolation. Listen to your body - when you can maintain intensity, you\'re ready! ⏱️`
+            };
+            
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('plateau')) return responses.plateau;
+            if (lowerMessage.includes('meal') || lowerMessage.includes('food')) return responses.meal;
+            if (lowerMessage.includes('motivat')) return responses.motivation;
+            if (lowerMessage.includes('rest') || lowerMessage.includes('time')) return responses.rest;
+            
+            return `Great question ${squadData[currentUser].name}! Based on your current progress (${squadData[currentUser].score} points, ${squadData[currentUser].streak}-day streak), I recommend focusing on consistency and progressive overload. You're doing amazing! Keep pushing! 🚀`;
+        }
+
+        function getCurrentRank() {
+            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
+            const rank = sortedUsers.findIndex(([user, data]) => user === currentUser) + 1;
+            return rank;
+        }
+
+        function acceptAIChallenge() {
+            squadData[currentUser].score += 10;
+            squadData[currentUser].lastActive = new Date().toISOString();
+            showNotification('AI Challenge accepted! +10 points! 🤖', 'success');
+            
+            if (isFirebaseConnected) {
+                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+            }
+            updateDisplays();
+        }
+
+        // Challenge functions
+        function createChallenge() {
+            const title = document.getElementById('challengeTitle').value;
+            const desc = document.getElementById('challengeDesc').value;
+            const duration = document.getElementById('challengeDuration').value;
+            
+            if (title && desc) {
+                showNotification(`Challenge "${title}" created! 🎯`, 'success');
+                
+                document.getElementById('challengeTitle').value = '';
+                document.getElementById('challengeDesc').value = '';
+                
+                squadData[currentUser].score += 5;
+                squadData[currentUser].lastActive = new Date().toISOString();
+                
+                if (isFirebaseConnected) {
+                    saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+                }
+                updateDisplays();
+            } else {
+                showNotification('Please fill in title and description! ⚠️', 'warning');
+            }
+        }
+
+        function uploadChallengePhoto() {
+            showNotification('Challenge photo uploaded! 📸', 'success');
+        }
+
+        // Social interaction functions
+        function likePost(postId) {
+            showNotification('Liked! 👍', 'success');
+        }
+
+        function commentPost(postId) {
+            const comment = prompt('Add a comment:');
+            if (comment) {
+                showNotification('Comment added! 💬', 'success');
+            }
+        }
+
+        function motivatePost(postId) {
+            showNotification('Motivation sent! 🔥', 'success');
+        }
+
+        function addPhoto() {
+            showNotification('Photo feature coming soon! 📷', 'info');
+        }
+
+        function shareWorkout() {
+            const workouts = [
+                "Just finished an epic chest and triceps session! 💪",
+                "Deadlift day! Feeling stronger than ever! 🔥",
+                "Cardio done! 30 minutes of pure sweat! 🏃‍♂️",
+                "Leg day complete! Can barely walk! 🦵",
+                "Full body workout in the books! 💯"
+            ];
+            
+            const randomWorkout = workouts[Math.floor(Math.random() * workouts.length)];
+            document.getElementById('postInput').value = randomWorkout;
+            showNotification('Workout shared! Now post it! 💪', 'info');
+        }
+
+        function sendMotivation(member) {
+            squadData[currentUser].score += 1;
+            squadData[currentUser].lastActive = new Date().toISOString();
+            showNotification(`Motivation sent to ${squadData[member].name}! +1 point! 🔥`, 'success');
+            
+            if (isFirebaseConnected) {
+                saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+            }
+            updateDisplays();
+        }
+
+        function switchToProfile(profileId) {
+            if (profileId !== currentUser) {
+                showNotification(`Switched to view ${squadData[profileId].name}'s profile! 👤`, 'info');
+            }
+        }
+
+        // Display update functions
+        function updateProfileScores() {
+            Object.keys(squadData).forEach(user => {
+                const scoreElement = document.getElementById(`${user}-score`);
+                const streakElement = document.getElementById(`${user}-streak`);
+                
+                if (scoreElement) scoreElement.textContent = squadData[user].score;
+                if (streakElement) streakElement.textContent = squadData[user].streak;
+            });
+        }
+
+        function updateDashboardStats() {
+            const users = Object.values(squadData);
+            const averageScore = Math.round(users.reduce((sum, user) => sum + user.score, 0) / users.length);
+            const maxStreak = Math.max(...users.map(user => user.streak));
+            
+            document.getElementById('averageScore').textContent = averageScore;
+            document.getElementById('teamStreak').textContent = maxStreak;
+        }
+
+        function updateDisplays() {
+            if (!currentUser) return;
+            
+            // Update global progress
+            const startDate = new Date('2025-06-01');
+            const currentDate = new Date();
+            const totalDays = 365;
+            const completedDays = Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24));
+            const percentage = Math.max(0, Math.min(100, (completedDays / totalDays) * 100));
+            
+            document.getElementById('globalProgress').textContent = percentage.toFixed(1) + '%';
+            document.getElementById('globalPercentage').textContent = percentage.toFixed(1) + '%';
+            document.getElementById('daysRemaining').textContent = Math.max(0, totalDays - completedDays);
+            
+            // Update current leader
+            const sortedUsers = Object.entries(squadData).sort((a, b) => b[1].score - a[1].score);
+            document.getElementById('currentLeader').textContent = sortedUsers[0][1].name;
+            
+            // Update progress circle
+            const circumference = 2 * Math.PI * 65;
+            const progressCircle = document.getElementById('globalProgressCircle');
+            const strokeDashoffset = circumference - (percentage / 100) * circumference;
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = strokeDashoffset;
+            
+            updateProfileScores();
+            updateDashboardStats();
+        }
+
+        // Utility functions
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            
+            const colors = {
+                success: '#10b981',
+                warning: '#f59e0b',
+                error: '#ef4444',
+                info: '#3b82f6'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type] || colors.success};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+                border-left: 4px solid rgba(255,255,255,0.3);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function exportData() {
+            const dataToExport = {
+                squadData: squadData,
+                posts: posts,
+                exportDate: new Date().toISOString(),
+                version: '2.0',
+                firebaseEnabled: isFirebaseConnected
+            };
+            
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `squad-battle-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showNotification('📥 Data exported successfully!', 'success');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const importedData = JSON.parse(e.target.result);
+                            if (importedData.squadData && importedData.posts) {
+                                squadData = importedData.squadData;
+                                posts = importedData.posts;
+                                
+                                if (isFirebaseConnected) {
+                                    saveToFirebase('squadData', squadData);
+                                    saveToFirebase('posts', posts.reduce((acc, post) => {
+                                        acc[post.id] = post;
+                                        return acc;
+                                    }, {}));
+                                }
+                                
+                                updateDisplays();
+                                updateSocialFeedFromData();
+                                showNotification('📤 Data imported successfully!', 'success');
+                            } else {
+                                showNotification('⚠️ Invalid data file format', 'warning');
+                            }
+                        } catch (error) {
+                            showNotification('❌ Failed to import data', 'error');
+                            console.error('Import error:', error);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ This will delete ALL squad data permanently! Are you sure?')) {
+                if (isFirebaseConnected) {
+                    database.ref('squadData').remove();
+                    database.ref('posts').remove();
+                    showNotification('🔥 Firebase data cleared!', 'warning');
+                }
+                
+                Object.keys(squadData).forEach(user => {
+                    squadData[user].score = 0;
+                    squadData[user].streak = 0;
+                    squadData[user].checkIns = {};
+                    squadData[user].weight = [];
+                    squadData[user].photos = [];
+                });
+                posts = [];
+                
+                location.reload();
+            }
+        }
+
+        function showDataInfo() {
+            const dataSize = JSON.stringify(squadData).length;
+            const postCount = posts.length;
+            const onlineUsers = Object.values(squadData).filter(user => user.isOnline).length;
+            
+            alert(`📊 Data Information:
+            
+${isFirebaseConnected ? '🔥 Firebase: Connected' : '❌ Firebase: Not Connected'}
+📏 Data size: ${(dataSize / 1024).toFixed(2)} KB
+📝 Posts: ${postCount}
+👥 Users: ${Object.keys(squadData).length}
+🟢 Online: ${onlineUsers} users
+
+${isFirebaseConnected ? '✅ Real-time sync active' : '⚠️ No real-time sync - Firebase not configured'}`);
+        }
+
+        function testFirebaseConnection() {
+            if (!isFirebaseConnected) {
+                showNotification('Firebase not connected!', 'error');
+                return;
+            }
+            
+            showNotification('Testing Firebase connection...', 'info');
+            
+            database.ref('test').set({
+                timestamp: new Date().toISOString(),
+                user: currentUser || 'anonymous'
+            }).then(() => {
+                showNotification('🔥 Firebase connection successful!', 'success');
+                return database.ref('test').remove();
+            }).catch((error) => {
+                showNotification('❌ Firebase connection failed!', 'error');
+                console.error('Firebase test error:', error);
+            });
+        }
+
+        function showFirebaseSetup() {
+            const setupInstructions = `
+🔥 Firebase Setup Instructions:
+
+1. Go to https://console.firebase.google.com/
+2. Create a new project
+3. Enable Realtime Database
+4. Set rules to: { "rules": { ".read": true, ".write": true } }
+5. Copy your config from Project Settings > General > Web apps
+6. Replace the firebaseConfig object in the HTML file
+
+Your config should look like:
+{
+  apiKey: "your-actual-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+  projectId: "your-project-id",
+  // ... other config
+}
+
+Then redeploy your HTML file!
+            `;
+            
+            alert(setupInstructions);
+        }
+
+        // Daily motivations
+        const dailyMotivations = [
+            "Today, you choose between 'I wish' and 'I will' - Choose wisely! 💪",
+            "Champions don't become champions in the ring - They're made in training! 🥊",
+            "Your only competition? The person you were yesterday! Beat him! 🚀",
+            "Success is the sum of small efforts repeated daily! Keep summing! ➕",
+            "Every workout is a deposit in your future self's bank account! 💰",
+            "The pain you feel today will be the strength you feel tomorrow! 🔥",
+            "Don't wish for it, work for it! The 20K DH is waiting! 💎",
+            "Your body can stand almost anything. It's your mind you have to convince! 🧠"
+        ];
+
+        function updateDailyMotivation() {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+            const motivationIndex = dayOfYear % dailyMotivations.length;
+            document.getElementById('dailyMotivation').textContent = dailyMotivations[motivationIndex];
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.activeElement.id === 'chatInput') {
+                sendAIMessage();
+            }
+            
+            if (e.key === 'Enter' && e.ctrlKey && document.activeElement.id === 'postInput') {
+                createPost();
+            }
+        });
+
+        // Initialize app
+        function initApp() {
+            updateDailyMotivation();
+            
+            // Load data from Firebase
+            loadFromFirebase();
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                
+                .profile-option:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                }
+                
+                .btn:hover {
+                    transform: translateY(-1px);
+                }
+                
+                .player-card:hover {
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                }
+                
+                .data-management {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    z-index: 1000;
+                }
+                
+                .data-btn {
+                    display: block;
+                    margin: 5px 0;
+                    padding: 8px 12px;
+                    background: ${isFirebaseConnected ? '#10b981' : '#374151'};
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 0.8rem;
+                    cursor: pointer;
+                    opacity: 0.7;
+                    transition: opacity 0.3s;
+                }
+                
+                .data-btn:hover {
+                    opacity: 1;
+                }
+                
+                .firebase-status {
+                    position: fixed;
+                    top: 10px;
+                    left: 10px;
+                    padding: 5px 10px;
+                    border-radius: 15px;
+                    font-size: 0.7rem;
+                    font-weight: bold;
+                    z-index: 1000;
+                    ${isFirebaseConnected ? 
+                        'background: #10b981; color: white;' : 
+                        'background: #f59e0b; color: white;'
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add Firebase connection status indicator
+            const statusIndicator = document.createElement('div');
+            statusIndicator.className = 'firebase-status';
+            statusIndicator.textContent = isFirebaseConnected ? '🔥 LIVE' : '⚠️ OFFLINE';
+            statusIndicator.title = isFirebaseConnected ? 
+                'Connected to Firebase - Real-time sync active' : 
+                'Firebase not connected - No real-time sync';
+            document.body.appendChild(statusIndicator);
+            
+            // Add data management buttons
+            const dataManagement = document.createElement('div');
+            dataManagement.className = 'data-management';
+            dataManagement.innerHTML = `
+                <button class="data-btn" onclick="exportData()" title="Export all data">📥 Export</button>
+                <button class="data-btn" onclick="importData()" title="Import data">📤 Import</button>
+                <button class="data-btn" onclick="clearAllData()" title="Clear all data">🗑️ Reset</button>
+                <button class="data-btn" onclick="showDataInfo()" title="Data info">ℹ️ Info</button>
+                ${isFirebaseConnected ? 
+                    '<button class="data-btn" onclick="testFirebaseConnection()" title="Test connection">🔥 Test</button>' : 
+                    '<button class="data-btn" onclick="showFirebaseSetup()" title="Setup Firebase">⚙️ Setup</button>'
+                }
+            `;
+            document.body.appendChild(dataManagement);
+        }
+
+        // Real-time updates simulation (for when Firebase is not connected)
+        function simulateRealTimeUpdates() {
+            if (!isFirebaseConnected) {
+                setInterval(() => {
+                    if (currentUser) {
+                        Object.keys(squadData).forEach(user => {
+                            if (user !== currentUser && Math.random() < 0.05) {
+                                squadData[user].score += Math.floor(Math.random() * 3);
+                                if (squadData[user].score > 100) squadData[user].score = 100;
+                            }
+                        });
+                        updateDisplays();
+                    }
+                }, 30000);
+            }
+        }
+
+        // Start the app
+        initApp();
+        simulateRealTimeUpdates();
+        
+        // Update displays every hour
+        setInterval(updateDisplays, 3600000);
+        
+        // Show welcome message
+        setTimeout(() => {
+            if (!currentUser) {
+                showNotification(
+                    isFirebaseConnected ? 
+                    '🔥 Firebase connected! Real-time sync ready!' : 
+                    '⚠️ Firebase not configured. Add your config for real-time sync!', 
+                    isFirebaseConnected ? 'success' : 'warning'
+                );
+            }
+        }, 2000);
+
+        // Handle page visibility changes for online status
+        document.addEventListener('visibilitychange', () => {
+            if (currentUser) {
+                const isVisible = !document.hidden;
+                setUserOnline(currentUser, isVisible);
+                if (isVisible) {
+                    squadData[currentUser].lastActive = new Date().toISOString();
+                    if (isFirebaseConnected) {
+                        saveToFirebase(`squadData/${currentUser}`, squadData[currentUser]);
+                    }
+                }
+            }
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                setUserOnline(currentUser, false);
+            }
         });
     </script>
 </body>
