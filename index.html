@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitSquad Pro - 20K DH Challenge</title>
-    
+    <title>FitSquad Pro - Daily Fitness Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
@@ -623,6 +622,205 @@
             width: auto;
         }
 
+        /* History View Styles */
+        .history-container {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .calendar-month {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 8px 0;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .calendar-day.empty {
+            visibility: hidden;
+        }
+        
+        .calendar-day:hover:not(.empty) {
+            background: var(--background-color);
+        }
+        
+        .calendar-day.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .calendar-day.has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+        
+        .history-details {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .history-details-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 0;
+        }
+        
+        /* Daily Challenge Save Button */
+        .save-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .save-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .save-btn:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+        
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Streak Indicator */
+        .streak-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--success-color);
+            margin-left: 12px;
+        }
+        
+        .streak-fire {
+            color: #f59e0b;
+        }
+        
+        /* Password Reset Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        /* Progress Chart */
+        .progress-chart {
+            height: 200px;
+            margin-top: 24px;
+            position: relative;
+        }
+        
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 12px;
+            background: var(--primary-color);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+        
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -650,6 +848,10 @@
 
             .chat-message {
                 max-width: 85%;
+            }
+            
+            .calendar-day {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -712,6 +914,21 @@
         </div>
     </div>
 
+    <!-- Password Reset Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Reset Password</h3>
+                <button class="modal-close" onclick="closeResetModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" id="resetEmail" placeholder="Enter your email">
+            </div>
+            <button class="btn" onclick="sendPasswordReset()">Send Reset Link</button>
+        </div>
+    </div>
+
     <!-- Main Application -->
     <div id="mainApp" class="app-container">
         <div class="header">
@@ -743,8 +960,14 @@
             <!-- Daily Dashboard -->
             <div class="daily-dashboard">
                 <div class="daily-header">
-                    <div class="daily-title">Today's Challenge</div>
-                    <div class="daily-date" id="todayDate"></div>
+                    <div>
+                        <div class="daily-title">Today's Challenge</div>
+                        <div class="daily-date" id="todayDate"></div>
+                    </div>
+                    <div class="streak-indicator" id="streakIndicator">
+                        <span id="streakCount">0</span>
+                        <span class="streak-fire">🔥</span>
+                    </div>
                 </div>
                 
                 <div class="daily-progress">
@@ -802,37 +1025,47 @@
                         <div class="metric-value" id="sleepValue">0</div>
                     </div>
                 </div>
+                
+                <div class="save-container">
+                    <button class="save-btn" id="saveDailyBtn" onclick="saveDailyData()">
+                        <span>💾</span> Save Today's Progress
+                    </button>
+                </div>
             </div>
-
-            <!-- Traditional Dashboard Grid -->
-            <div class="dashboard-grid">
-                <div class="card">
-                    <h3 class="card-title">Weekly Summary</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <div class="metric-value" id="weeklyScore">0</div>
-                            <div class="metric-label">This Week</div>
-                        </div>
-                        <div>
-                            <div class="metric-value" id="weeklyStreak">0</div>
-                            <div class="metric-label">Day Streak</div>
-                        </div>
+            
+            <!-- History Section -->
+            <div class="history-container">
+                <h3 class="card-title">📅 Your History</h3>
+                
+                <div class="calendar-nav">
+                    <button class="btn-sm" onclick="prevMonth()">← Prev</button>
+                    <div class="calendar-month" id="calendarMonth">July 2025</div>
+                    <button class="btn-sm" onclick="nextMonth()">Next →</button>
+                </div>
+                
+                <div class="calendar-grid" id="calendarHeaders">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                </div>
+                
+                <div class="calendar-grid" id="calendarDays"></div>
+                
+                <div class="history-details" id="historyDetails">
+                    <div class="history-details-empty">
+                        Select a date to view details
                     </div>
                 </div>
-
-                <div class="card">
-                    <h3 class="card-title">Your Stats</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <div class="metric-value" id="totalScore">0</div>
-                            <div class="metric-label">Total Points</div>
-                        </div>
-                        <div>
-                            <div class="metric-value" id="userRank">#-</div>
-                            <div class="metric-label">Your Rank</div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            
+            <!-- Progress Chart -->
+            <div class="card">
+                <h3 class="card-title">📈 30-Day Progress</h3>
+                <div class="progress-chart" id="progressChart"></div>
             </div>
         </div>
 
@@ -919,6 +1152,10 @@
         let currentUser = null;
         let userData = {};
         let dailyData = {};
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let selectedDate = new Date().toDateString();
+        let historyData = {};
 
         // Initialize Firebase
         function initializeFirebase() {
@@ -975,6 +1212,32 @@
         function showRegisterForm() {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showResetPassword() {
+            document.getElementById('resetModal').classList.add('active');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.remove('active');
+        }
+
+        async function sendPasswordReset() {
+            const email = document.getElementById('resetEmail').value.trim();
+            
+            if (!email) {
+                showNotification('Please enter your email', 'error');
+                return;
+            }
+            
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showNotification('Password reset link sent to your email', 'success');
+                closeResetModal();
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showNotification(getErrorMessage(error), 'error');
+            }
         }
 
         async function loginUser() {
@@ -1157,6 +1420,17 @@
             document.getElementById('userAvatar').textContent = (userData.name || 'U').charAt(0).toUpperCase();
             document.getElementById('totalScore').textContent = userData.score || 0;
             document.getElementById('weeklyStreak').textContent = userData.streak || 0;
+            updateStreakIndicator();
+        }
+
+        function updateStreakIndicator() {
+            const streak = userData.streak || 0;
+            document.getElementById('streakCount').textContent = streak;
+            
+            if (streak >= 7) {
+                document.getElementById('streakIndicator').style.background = 'rgba(245, 158, 11, 0.1)';
+                document.getElementById('streakIndicator').style.color = '#f59e0b';
+            }
         }
 
         async function updateUserOnlineStatus(isOnline) {
@@ -1229,17 +1503,50 @@
             
             try {
                 await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}/${metric}`).set(value);
-                
-                // Calculate points for the day
-                const points = calculateDailyPoints();
-                await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}/points`).set(points);
-                
                 updateDailyInterface();
-                showNotification(`${metric} updated! 📊`, 'success');
                 
             } catch (error) {
                 console.error('Error updating metric:', error);
                 showNotification('Error updating metric', 'error');
+            }
+        }
+
+        async function saveDailyData() {
+            if (!currentUser || !database) return;
+            
+            const today = new Date().toDateString();
+            const saveBtn = document.getElementById('saveDailyBtn');
+            
+            try {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span>⏳</span> Saving...';
+                
+                // Calculate points
+                const points = calculateDailyPoints();
+                dailyData.points = points;
+                dailyData.date = today;
+                dailyData.timestamp = new Date().toISOString();
+                
+                // Save to Firebase
+                await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}`).set(dailyData);
+                
+                // Update streak
+                await updateStreak();
+                
+                // Update total score
+                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                    return (score || 0) + points;
+                });
+                
+                showNotification('Daily progress saved! 🎉', 'success');
+                
+            } catch (error) {
+                console.error('Error saving daily data:', error);
+                showNotification('Error saving data', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span>💾</span> Save Today\'s Progress';
+                loadHistoryData();
             }
         }
 
@@ -1271,6 +1578,241 @@
             
             document.getElementById('dailyProgressFill').style.width = percentage + '%';
             document.getElementById('dailyProgressPercent').textContent = Math.round(percentage) + '%';
+        }
+
+        async function updateStreak() {
+            if (!currentUser || !database) return;
+            
+            try {
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                const yesterdayStr = yesterday.toDateString();
+                const yesterdaySnapshot = await database.ref(`users/${currentUser.uid}/dailyMetrics/${yesterdayStr}`).once('value');
+                
+                let newStreak = 1;
+                if (yesterdaySnapshot.exists()) {
+                    const currentStreak = userData.streak || 0;
+                    newStreak = currentStreak + 1;
+                }
+                
+                await database.ref(`users/${currentUser.uid}/streak`).set(newStreak);
+                userData.streak = newStreak;
+                updateStreakIndicator();
+                
+            } catch (error) {
+                console.error('Error updating streak:', error);
+            }
+        }
+
+        // History Calendar Functions
+        function renderCalendar() {
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+            
+            // Set month header
+            document.getElementById('calendarMonth').textContent = 
+                new Date(currentYear, currentMonth).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            
+            // Add empty cells for days before the first day
+            for (let i = 0; i < startingDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                
+                const date = new Date(currentYear, currentMonth, i);
+                const dateStr = date.toDateString();
+                
+                // Check if date has data
+                if (historyData[dateStr]) {
+                    day.classList.add('has-data');
+                }
+                
+                // Highlight selected date
+                if (dateStr === selectedDate) {
+                    day.classList.add('active');
+                }
+                
+                day.addEventListener('click', () => {
+                    selectedDate = dateStr;
+                    renderCalendar();
+                    showHistoryDetails(dateStr);
+                });
+                
+                calendarDays.appendChild(day);
+            }
+        }
+        
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            loadHistoryData();
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            loadHistoryData();
+        }
+        
+        async function loadHistoryData() {
+            if (!currentUser || !database) return;
+            
+            try {
+                const snapshot = await database.ref(`users/${currentUser.uid}/dailyMetrics`).once('value');
+                
+                if (snapshot.exists()) {
+                    historyData = snapshot.val();
+                    
+                    // Also load data for adjacent months for better calendar display
+                    const prevMonthDate = new Date(currentYear, currentMonth - 1, 1);
+                    const nextMonthDate = new Date(currentYear, currentMonth + 1, 1);
+                    
+                    const prevMonthStr = prevMonthDate.toDateString().split(' ')[1] + prevMonthDate.getFullYear();
+                    const nextMonthStr = nextMonthDate.toDateString().split(' ')[1] + nextMonthDate.getFullYear();
+                    
+                    for (const date in historyData) {
+                        const dateObj = new Date(date);
+                        const monthStr = dateObj.toDateString().split(' ')[1] + dateObj.getFullYear();
+                        
+                        if (monthStr === prevMonthStr || monthStr === nextMonthStr) {
+                            historyData[date] = historyData[date];
+                        }
+                    }
+                }
+                
+                renderCalendar();
+                showHistoryDetails(selectedDate);
+                renderProgressChart();
+                
+            } catch (error) {
+                console.error('Error loading history data:', error);
+            }
+        }
+        
+        function showHistoryDetails(dateStr) {
+            const detailsContainer = document.getElementById('historyDetails');
+            
+            if (historyData[dateStr]) {
+                const data = historyData[dateStr];
+                const date = new Date(dateStr);
+                
+                detailsContainer.innerHTML = `
+                    <h4>${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h4>
+                    <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Weight</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;">${data.weight || '-'} kg</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Training</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;">${data.training ? '✅ Completed' : '❌ Not done'}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Cardio</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;">${data.cardio || 0} min</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Protein</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;">${data.protein || 0} g</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Water</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;">${data.water || 0} L</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">Sleep</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;">${data.sleep || 0} hrs</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-weight: 600;">Daily Score</span>
+                            <span style="font-weight: 600; color: var(--success-color);">${data.points || 0} pts</span>
+                        </div>
+                    </div>
+                    
+                    ${data.mealPhotos ? `
+                    <div style="margin-top: 24px;">
+                        <h5 style="margin-bottom: 12px;">Meal Photos</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px;">
+                            ${Object.values(data.mealPhotos).map(photo => `
+                                <img src="${photo.url}" style="width: 100%; border-radius: 8px; aspect-ratio: 1; object-fit: cover;">
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+            } else {
+                detailsContainer.innerHTML = `
+                    <div class="history-details-empty">
+                        No data recorded for this day
+                    </div>
+                `;
+            }
+        }
+        
+        function renderProgressChart() {
+            const chartContainer = document.getElementById('progressChart');
+            chartContainer.innerHTML = '';
+            
+            // Get last 30 days of data
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - 30);
+            
+            const days = [];
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                days.push(new Date(d));
+            }
+            
+            // Find max points for scaling
+            let maxPoints = 20; // Default minimum
+            days.forEach(day => {
+                const dayData = historyData[day.toDateString()];
+                if (dayData && dayData.points > maxPoints) {
+                    maxPoints = dayData.points;
+                }
+            });
+            
+            // Create bars
+            days.forEach((day, index) => {
+                const dayData = historyData[day.toDateString()];
+                const points = dayData ? dayData.points : 0;
+                
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.left = `${(index / days.length) * 100}%`;
+                bar.style.height = `${(points / maxPoints) * 100}%`;
+                bar.style.width = `${(1 / days.length) * 100 - 2}%`;
+                
+                // Tooltip
+                bar.title = `${day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${points} pts`;
+                
+                chartContainer.appendChild(bar);
+            });
         }
 
         // Meal Photo Functions
@@ -1328,7 +1870,10 @@
                     uploadDate: new Date().toISOString()
                 };
                 
+                // Save to both mealPhotos and daily metrics
+                const today = new Date().toDateString();
                 await database.ref(`users/${currentUser.uid}/mealPhotos/${timestamp}`).set(photoData);
+                await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}/mealPhotos/${timestamp}`).set(photoData);
                 
                 // Award points for meal prep
                 await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
@@ -1363,6 +1908,10 @@
             try {
                 await storage.ref(fileName).delete();
                 await database.ref(`users/${currentUser.uid}/mealPhotos/${timestamp}`).remove();
+                
+                // Also remove from daily metrics if it exists
+                const today = new Date().toDateString();
+                await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}/mealPhotos/${timestamp}`).remove();
                 
                 // Remove points
                 await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
@@ -1573,6 +2122,14 @@
             updateGlobalProgress();
             setupMetricInputs();
             initMealUpload();
+            
+            // Add password reset link to login form
+            const loginForm = document.getElementById('loginForm');
+            const resetLink = document.createElement('div');
+            resetLink.style.marginTop = '12px';
+            resetLink.style.fontSize = '0.875rem';
+            resetLink.innerHTML = '<a href="#" onclick="showResetPassword()" style="color: var(--primary-color);">Forgot password?</a>';
+            loginForm.appendChild(resetLink);
             
             setTimeout(() => {
                 if (initializeFirebase()) {
