@@ -1,84 +1,89 @@
 // Global Functions - Expose module functions globally for HTML onclick handlers
 
+// Wait for modules to load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Global functions loaded');
+});
+
 // Authentication functions
 function showLoginForm() {
-    auth.showLoginForm();
+    if (window.auth) window.auth.showLoginForm();
 }
 
 function showRegisterForm() {
-    auth.showRegisterForm();
+    if (window.auth) window.auth.showRegisterForm();
 }
 
 function showForgotPasswordForm() {
-    auth.showForgotPasswordForm();
+    if (window.auth) window.auth.showForgotPasswordForm();
 }
 
 function loginUser() {
-    auth.loginUser();
+    if (window.auth) window.auth.loginUser();
 }
 
 function registerUser() {
-    auth.registerUser();
+    if (window.auth) window.auth.registerUser();
 }
 
 function signInWithGoogle() {
-    auth.signInWithGoogle();
+    if (window.auth) window.auth.signInWithGoogle();
 }
 
 function resetPassword() {
-    auth.resetPassword();
+    if (window.auth) window.auth.resetPassword();
 }
 
 function signOut() {
-    auth.signOut();
+    if (window.auth) window.auth.signOut();
 }
 
 // UI functions
 function showTab(tabName) {
-    ui.showTab(tabName);
+    if (window.ui) window.ui.showTab(tabName);
 }
 
 // Dashboard functions
 function saveDailyData() {
-    dashboard.saveDailyData();
+    if (window.dashboard) window.dashboard.saveDailyData();
 }
 
 function updateDailyMetric(metric, value) {
-    dashboard.updateDailyMetric(metric, value);
+    if (window.dashboard) window.dashboard.updateDailyMetric(metric, value);
 }
 
 // Chat functions
 function sendMessage() {
-    chat.sendMessage();
+    if (window.chat) window.chat.sendMessage();
 }
 
 // Meal prep functions
 function showUploadModal() {
-    mealPrep.showUploadModal();
+    if (window.mealPrep) window.mealPrep.showUploadModal();
 }
 
 function closeUploadModal() {
-    mealPrep.closeUploadModal();
+    if (window.mealPrep) window.mealPrep.closeUploadModal();
 }
 
 function uploadFromModal() {
-    mealPrep.uploadFromModal();
+    if (window.mealPrep) window.mealPrep.uploadFromModal();
 }
 
 function deleteMealPhoto(timestamp, fileName) {
-    mealPrep.deleteMealPhoto(timestamp, fileName);
+    if (window.mealPrep) window.mealPrep.deleteMealPhoto(timestamp, fileName);
 }
 
 // History functions
 function loadDateHistory() {
-    history.loadDateHistory();
+    if (window.history) window.history.loadDateHistory();
 }
 
 function loadMonthHistory() {
-    history.loadMonthHistory();
+    if (window.history) window.history.loadMonthHistory();
 }
 
 // Utility functions
 function showNotification(message, type) {
-    ui.showNotification(message, type);
+    if (window.ui) window.ui.showNotification(message, type);
 }
