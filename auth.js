@@ -1,5 +1,5 @@
 // Authentication Module
-const auth = {
+window.auth = {
     // Show different forms
     showLoginForm() {
         document.getElementById('loginForm').classList.remove('hidden');
