@@ -22,11 +22,15 @@ class FitSquadApp {
             ui.init();
             
             // Initialize Firebase with retry logic
-            await this.initializeFirebaseWithRetry();
+            const success = await this.initializeFirebaseWithRetry();
             
-            // Mark as initialized
-            this.isInitialized = true;
-            console.log('✅ FitSquad Pro initialized successfully');
+            if (success) {
+                // Mark as initialized
+                this.isInitialized = true;
+                console.log('✅ FitSquad Pro initialized successfully');
+            } else {
+                throw new Error('Firebase initialization failed');
+            }
             
         } catch (error) {
             console.error('❌ Failed to initialize FitSquad Pro:', error);
