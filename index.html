@@ -256,6 +256,124 @@
             display: block;
         }
 
+        /* Daily Dashboard Styles */
+        .daily-dashboard {
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .daily-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .daily-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .daily-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .daily-progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .daily-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .daily-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 0.5s ease;
+        }
+
+        .daily-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .metric-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .metric-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .metric-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .metric-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .metric-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #10b981;
+        }
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -282,61 +400,174 @@
             margin-bottom: 20px;
         }
 
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            line-height: 1;
-        }
-
-        .metric-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border-color);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 16px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
-            transition: width 0.5s ease;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .action-btn {
-            padding: 16px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius);
+        /* Meal Prep Section */
+        .meal-prep {
             background: var(--surface-color);
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            text-align: center;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
         }
 
-        .action-btn:hover {
+        .meal-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+        }
+
+        .meal-upload:hover {
             border-color: var(--primary-color);
             background: #eff6ff;
         }
 
-        .action-btn.active {
-            background: var(--success-color);
-            border-color: var(--success-color);
+        .meal-upload.drag-over {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .meal-photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .meal-photo {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: var(--shadow);
+        }
+
+        .meal-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .meal-photo .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
             color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Chat Channel */
+        .chat-container {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--background-color);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            position: relative;
+        }
+
+        .chat-message.own {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.other {
+            background: var(--background-color);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message-author {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .chat-message-time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .chat-input-container {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 24px;
+            font-size: 14px;
+            resize: none;
+            min-height: 20px;
+            max-height: 100px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .chat-send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .chat-send-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .notification {
@@ -386,12 +617,22 @@
             display: none !important;
         }
 
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            width: auto;
+        }
+
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
         @media (max-width: 768px) {
+            .daily-metrics {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
@@ -405,6 +646,10 @@
             .header-stats {
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+
+            .chat-message {
+                max-width: 85%;
             }
         }
     </style>
@@ -482,88 +727,168 @@
             <div class="user-menu">
                 <div class="user-avatar" id="userAvatar">U</div>
                 <span id="userName">User</span>
-                <button class="btn" onclick="signOut()" style="width: auto; padding: 8px 16px;">Sign Out</button>
+                <button class="btn btn-sm" onclick="signOut()">Sign Out</button>
             </div>
         </div>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
-            <button class="nav-tab" onclick="showTab('progress')">Progress</button>
+            <button class="nav-tab active" onclick="showTab('dashboard')">Today</button>
+            <button class="nav-tab" onclick="showTab('mealprep')">Meal Prep</button>
+            <button class="nav-tab" onclick="showTab('chat')">Squad Chat</button>
             <button class="nav-tab" onclick="showTab('leaderboard')">Leaderboard</button>
-            <button class="nav-tab" onclick="showTab('social')">Feed</button>
         </div>
 
         <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
+            <!-- Daily Dashboard -->
+            <div class="daily-dashboard">
+                <div class="daily-header">
+                    <div class="daily-title">Today's Challenge</div>
+                    <div class="daily-date" id="todayDate"></div>
+                </div>
+                
+                <div class="daily-progress">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Daily Progress</span>
+                        <span id="dailyProgressPercent">0%</span>
+                    </div>
+                    <div class="daily-progress-bar">
+                        <div class="daily-progress-fill" id="dailyProgressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="daily-metrics">
+                    <div class="metric-card" onclick="toggleMetric('weight')">
+                        <div class="metric-icon">⚖️</div>
+                        <div class="metric-label">Weight (kg)</div>
+                        <input type="number" class="metric-input" id="weightInput" placeholder="Enter weight" step="0.1">
+                        <div class="metric-value" id="weightValue">-</div>
+                    </div>
+
+                    <div class="metric-card" onclick="toggleMetric('training')">
+                        <div class="metric-icon">💪</div>
+                        <div class="metric-label">Training Done</div>
+                        <div class="metric-checkbox">
+                            <input type="checkbox" id="trainingCheck" onchange="updateDailyMetric('training', this.checked)">
+                            <label for="trainingCheck">Completed</label>
+                        </div>
+                    </div>
+
+                    <div class="metric-card" onclick="toggleMetric('cardio')">
+                        <div class="metric-icon">🏃</div>
+                        <div class="metric-label">Cardio (min)</div>
+                        <input type="number" class="metric-input" id="cardioInput" placeholder="Minutes" min="0">
+                        <div class="metric-value" id="cardioValue">0</div>
+                    </div>
+
+                    <div class="metric-card" onclick="toggleMetric('protein')">
+                        <div class="metric-icon">🥩</div>
+                        <div class="metric-label">Protein (g)</div>
+                        <input type="number" class="metric-input" id="proteinInput" placeholder="Grams" min="0">
+                        <div class="metric-value" id="proteinValue">0</div>
+                    </div>
+
+                    <div class="metric-card" onclick="toggleMetric('water')">
+                        <div class="metric-icon">💧</div>
+                        <div class="metric-label">Water (L)</div>
+                        <input type="number" class="metric-input" id="waterInput" placeholder="Liters" step="0.1" min="0">
+                        <div class="metric-value" id="waterValue">0</div>
+                    </div>
+
+                    <div class="metric-card" onclick="toggleMetric('sleep')">
+                        <div class="metric-icon">😴</div>
+                        <div class="metric-label">Sleep (hrs)</div>
+                        <input type="number" class="metric-input" id="sleepInput" placeholder="Hours" step="0.5" min="0" max="24">
+                        <div class="metric-value" id="sleepValue">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traditional Dashboard Grid -->
             <div class="dashboard-grid">
                 <div class="card">
-                    <h3 class="card-title">Your Progress</h3>
-                    <div class="metric-value" id="userScore">0</div>
-                    <div class="metric-label">Total Points</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="userProgressBar" style="width: 0%"></div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--text-secondary);">
-                        <span>Current Streak: <span id="userStreak">0</span> days</span>
-                        <span>Rank: #<span id="userRank">-</span></span>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">Quick Check-in</h3>
-                    <div class="quick-actions">
-                        <div class="action-btn" onclick="quickCheckIn('workout')">
-                            💪 Workout
-                        </div>
-                        <div class="action-btn" onclick="quickCheckIn('nutrition')">
-                            🥗 Nutrition
-                        </div>
-                        <div class="action-btn" onclick="quickCheckIn('sleep')">
-                            😴 Sleep
-                        </div>
-                        <div class="action-btn" onclick="quickCheckIn('hydration')">
-                            💧 Hydration
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">Team Stats</h3>
+                    <h3 class="card-title">Weekly Summary</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
-                            <div class="metric-value" id="teamAverage">0</div>
-                            <div class="metric-label">Team Average</div>
+                            <div class="metric-value" id="weeklyScore">0</div>
+                            <div class="metric-label">This Week</div>
                         </div>
                         <div>
-                            <div class="metric-value" id="teamActive">0</div>
-                            <div class="metric-label">Active Today</div>
+                            <div class="metric-value" id="weeklyStreak">0</div>
+                            <div class="metric-label">Day Streak</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Your Stats</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <div class="metric-value" id="totalScore">0</div>
+                            <div class="metric-label">Total Points</div>
+                        </div>
+                        <div>
+                            <div class="metric-value" id="userRank">#-</div>
+                            <div class="metric-label">Your Rank</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Other tabs content here... -->
-        <div id="progress" class="tab-content">
-            <div class="card">
-                <h3 class="card-title">Coming Soon</h3>
-                <p>Progress tracking features will be available soon!</p>
+        <!-- Meal Prep Tab -->
+        <div id="mealprep" class="tab-content">
+            <div class="meal-prep">
+                <h3 class="card-title">📸 Meal Prep Gallery</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Upload photos of your meal prep to earn bonus points and inspire your squad!
+                </p>
+                
+                <div class="meal-upload" id="mealUpload">
+                    <div class="metric-icon">📷</div>
+                    <div style="margin-bottom: 8px; font-weight: 600;">Upload Meal Photo</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                        Click to select or drag & drop images
+                    </div>
+                    <input type="file" id="mealFileInput" accept="image/*" multiple style="display: none;">
+                </div>
+
+                <div class="meal-photos" id="mealPhotos">
+                    <!-- Meal photos will be dynamically added here -->
+                </div>
             </div>
         </div>
 
+        <!-- Chat Tab -->
+        <div id="chat" class="tab-content">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3 class="card-title" style="margin: 0;">Squad Chat 💬</h3>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                        <span id="onlineCount">0</span> members online
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+                
+                <div class="chat-input-container">
+                    <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+                    <button class="chat-send-btn" id="sendButton" onclick="sendMessage()">
+                        <span>➤</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Tab -->
         <div id="leaderboard" class="tab-content">
             <div class="card">
-                <h3 class="card-title">Live Rankings</h3>
+                <h3 class="card-title">🏆 Live Rankings</h3>
                 <div id="leaderboardContainer">
                     <p>Loading leaderboard...</p>
                 </div>
-            </div>
-        </div>
-
-        <div id="social" class="tab-content">
-            <div class="card">
-                <h3 class="card-title">Team Feed</h3>
-                <p>Social features coming soon!</p>
             </div>
         </div>
     </div>
@@ -572,6 +897,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
     <script>
         // Firebase Configuration
@@ -589,28 +915,28 @@
         // Global variables
         let auth = null;
         let database = null;
+        let storage = null;
         let currentUser = null;
         let userData = {};
+        let dailyData = {};
 
         // Initialize Firebase
         function initializeFirebase() {
             try {
                 console.log('🔥 Initializing Firebase...');
                 
-                // Check if Firebase is loaded
                 if (typeof firebase === 'undefined') {
                     throw new Error('Firebase SDK not loaded');
                 }
 
-                // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 database = firebase.database();
+                storage = firebase.storage();
                 
                 console.log('✅ Firebase initialized successfully');
                 updateFirebaseStatus('connected');
                 
-                // Set up auth state listener
                 auth.onAuthStateChanged(handleAuthStateChange);
                 
                 return true;
@@ -701,10 +1027,8 @@
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Update profile
                 await user.updateProfile({ displayName: name });
                 
-                // Create user data
                 const initialUserData = {
                     uid: user.uid,
                     name: name,
@@ -714,8 +1038,9 @@
                     streak: 0,
                     joinDate: new Date().toISOString(),
                     lastActive: new Date().toISOString(),
-                    checkIns: {},
-                    isOnline: true
+                    isOnline: true,
+                    dailyMetrics: {},
+                    mealPhotos: {}
                 };
                 
                 await database.ref(`users/${user.uid}`).set(initialUserData);
@@ -739,7 +1064,6 @@
                 const result = await auth.signInWithPopup(provider);
                 const user = result.user;
                 
-                // Check if user exists
                 const userSnapshot = await database.ref(`users/${user.uid}`).once('value');
                 
                 if (!userSnapshot.exists()) {
@@ -755,8 +1079,9 @@
                         streak: 0,
                         joinDate: new Date().toISOString(),
                         lastActive: new Date().toISOString(),
-                        checkIns: {},
-                        isOnline: true
+                        isOnline: true,
+                        dailyMetrics: {},
+                        mealPhotos: {}
                     };
                     
                     await database.ref(`users/${user.uid}`).set(initialUserData);
@@ -792,7 +1117,9 @@
                 currentUser = user;
                 showMainApp();
                 loadUserData();
+                loadTodayData();
                 updateUserOnlineStatus(true);
+                setupChatListener();
             } else {
                 currentUser = null;
                 showAuthScreen();
@@ -807,6 +1134,7 @@
         function showMainApp() {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
+            updateTodayDate();
         }
 
         // User Data Functions
@@ -827,12 +1155,8 @@
         function updateUserInterface() {
             document.getElementById('userName').textContent = userData.name || 'User';
             document.getElementById('userAvatar').textContent = (userData.name || 'U').charAt(0).toUpperCase();
-            document.getElementById('userScore').textContent = userData.score || 0;
-            document.getElementById('userStreak').textContent = userData.streak || 0;
-            
-            const maxScore = 1000;
-            const progressPercentage = Math.min(100, (userData.score / maxScore) * 100);
-            document.getElementById('userProgressBar').style.width = progressPercentage + '%';
+            document.getElementById('totalScore').textContent = userData.score || 0;
+            document.getElementById('weeklyStreak').textContent = userData.streak || 0;
         }
 
         async function updateUserOnlineStatus(isOnline) {
@@ -848,36 +1172,295 @@
             }
         }
 
-        // Quick Check-in
-        async function quickCheckIn(type) {
+        // Daily Metrics Functions
+        function updateTodayDate() {
+            const today = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        async function loadTodayData() {
             if (!currentUser || !database) return;
             
             const today = new Date().toDateString();
-            const checkInPath = `users/${currentUser.uid}/checkIns/${today}/${type}`;
             
             try {
-                const snapshot = await database.ref(checkInPath).once('value');
-                const isCheckedIn = snapshot.exists();
-                
-                if (isCheckedIn) {
-                    await database.ref(checkInPath).remove();
-                    await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
-                        return Math.max(0, (score || 0) - 10);
-                    });
-                    showNotification(`${type} check-in removed`, 'warning');
+                const snapshot = await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}`).once('value');
+                if (snapshot.exists()) {
+                    dailyData = snapshot.val();
+                    updateDailyInterface();
                 } else {
-                    await database.ref(checkInPath).set(true);
-                    await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
-                        return (score || 0) + 10;
-                    });
-                    showNotification(`Great job! +10 points for ${type}! 🎉`, 'success');
+                    dailyData = {};
                 }
+            } catch (error) {
+                console.error('Error loading today data:', error);
+            }
+        }
+
+        function updateDailyInterface() {
+            // Update input values
+            document.getElementById('weightInput').value = dailyData.weight || '';
+            document.getElementById('cardioInput').value = dailyData.cardio || '';
+            document.getElementById('proteinInput').value = dailyData.protein || '';
+            document.getElementById('waterInput').value = dailyData.water || '';
+            document.getElementById('sleepInput').value = dailyData.sleep || '';
+            document.getElementById('trainingCheck').checked = dailyData.training || false;
+
+            // Update display values
+            document.getElementById('weightValue').textContent = dailyData.weight || '-';
+            document.getElementById('cardioValue').textContent = dailyData.cardio || '0';
+            document.getElementById('proteinValue').textContent = dailyData.protein || '0';
+            document.getElementById('waterValue').textContent = dailyData.water || '0';
+            document.getElementById('sleepValue').textContent = dailyData.sleep || '0';
+
+            updateDailyProgress();
+        }
+
+        async function updateDailyMetric(metric, value) {
+            if (!currentUser || !database) return;
+            
+            const today = new Date().toDateString();
+            dailyData[metric] = value;
+            
+            try {
+                await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}/${metric}`).set(value);
                 
-                await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
+                // Calculate points for the day
+                const points = calculateDailyPoints();
+                await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}/points`).set(points);
+                
+                updateDailyInterface();
+                showNotification(`${metric} updated! 📊`, 'success');
                 
             } catch (error) {
-                console.error('Check-in error:', error);
-                showNotification('Error updating check-in', 'error');
+                console.error('Error updating metric:', error);
+                showNotification('Error updating metric', 'error');
+            }
+        }
+
+        function calculateDailyPoints() {
+            let points = 0;
+            
+            if (dailyData.weight) points += 5;
+            if (dailyData.training) points += 20;
+            if (dailyData.cardio && dailyData.cardio >= 30) points += 15;
+            if (dailyData.protein && dailyData.protein >= 100) points += 10;
+            if (dailyData.water && dailyData.water >= 2) points += 10;
+            if (dailyData.sleep && dailyData.sleep >= 7) points += 10;
+            
+            return points;
+        }
+
+        function updateDailyProgress() {
+            const maxTasks = 6; // weight, training, cardio, protein, water, sleep
+            let completedTasks = 0;
+            
+            if (dailyData.weight) completedTasks++;
+            if (dailyData.training) completedTasks++;
+            if (dailyData.cardio && dailyData.cardio > 0) completedTasks++;
+            if (dailyData.protein && dailyData.protein > 0) completedTasks++;
+            if (dailyData.water && dailyData.water > 0) completedTasks++;
+            if (dailyData.sleep && dailyData.sleep > 0) completedTasks++;
+            
+            const percentage = (completedTasks / maxTasks) * 100;
+            
+            document.getElementById('dailyProgressFill').style.width = percentage + '%';
+            document.getElementById('dailyProgressPercent').textContent = Math.round(percentage) + '%';
+        }
+
+        // Meal Photo Functions
+        function initMealUpload() {
+            const uploadArea = document.getElementById('mealUpload');
+            const fileInput = document.getElementById('mealFileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        async function handleFiles(files) {
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    await uploadMealPhoto(file);
+                }
+            }
+        }
+
+        async function uploadMealPhoto(file) {
+            if (!currentUser || !storage || !database) return;
+            
+            try {
+                const timestamp = new Date().getTime();
+                const fileName = `meals/${currentUser.uid}/${timestamp}_${file.name}`;
+                const storageRef = storage.ref(fileName);
+                
+                showNotification('Uploading photo... 📸', 'warning');
+                
+                const snapshot = await storageRef.put(file);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                
+                const photoData = {
+                    url: downloadURL,
+                    timestamp: timestamp,
+                    fileName: fileName,
+                    uploadDate: new Date().toISOString()
+                };
+                
+                await database.ref(`users/${currentUser.uid}/mealPhotos/${timestamp}`).set(photoData);
+                
+                // Award points for meal prep
+                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                    return (score || 0) + 15;
+                });
+                
+                displayMealPhoto(photoData);
+                showNotification('Meal photo uploaded! +15 points! 🎉', 'success');
+                
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+                showNotification('Error uploading photo', 'error');
+            }
+        }
+
+        function displayMealPhoto(photoData) {
+            const container = document.getElementById('mealPhotos');
+            
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'meal-photo';
+            photoDiv.innerHTML = `
+                <img src="${photoData.url}" alt="Meal prep">
+                <button class="delete-btn" onclick="deleteMealPhoto('${photoData.timestamp}', '${photoData.fileName}')">✕</button>
+            `;
+            
+            container.prepend(photoDiv);
+        }
+
+        async function deleteMealPhoto(timestamp, fileName) {
+            if (!currentUser || !storage || !database) return;
+            
+            try {
+                await storage.ref(fileName).delete();
+                await database.ref(`users/${currentUser.uid}/mealPhotos/${timestamp}`).remove();
+                
+                // Remove points
+                await database.ref(`users/${currentUser.uid}/score`).transaction((score) => {
+                    return Math.max(0, (score || 0) - 15);
+                });
+                
+                showNotification('Photo deleted', 'warning');
+                loadMealPhotos();
+                
+            } catch (error) {
+                console.error('Error deleting photo:', error);
+                showNotification('Error deleting photo', 'error');
+            }
+        }
+
+        async function loadMealPhotos() {
+            if (!currentUser || !database) return;
+            
+            try {
+                const snapshot = await database.ref(`users/${currentUser.uid}/mealPhotos`).once('value');
+                const container = document.getElementById('mealPhotos');
+                container.innerHTML = '';
+                
+                if (snapshot.exists()) {
+                    const photos = snapshot.val();
+                    const sortedPhotos = Object.values(photos).sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    sortedPhotos.forEach(photo => {
+                        displayMealPhoto(photo);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading meal photos:', error);
+            }
+        }
+
+        // Chat Functions
+        function setupChatListener() {
+            if (!database) return;
+            
+            database.ref('chat').limitToLast(50).on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayChatMessage(message);
+            });
+            
+            // Listen for online users
+            database.ref('users').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    const onlineCount = Object.values(users).filter(user => user.isOnline).length;
+                    document.getElementById('onlineCount').textContent = onlineCount;
+                }
+            });
+        }
+
+        function displayChatMessage(message) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            
+            const isOwnMessage = message.uid === (currentUser ? currentUser.uid : null);
+            messageDiv.className = `chat-message ${isOwnMessage ? 'own' : 'other'}`;
+            
+            const time = new Date(message.timestamp).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            messageDiv.innerHTML = `
+                ${!isOwnMessage ? `<div class="chat-message-author">${message.nickname || message.name}</div>` : ''}
+                <div>${message.text}</div>
+                <div class="chat-message-time">${time}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentUser || !database) return;
+            
+            try {
+                const message = {
+                    uid: currentUser.uid,
+                    name: userData.name || 'User',
+                    nickname: userData.nickname || 'Challenger',
+                    text: text,
+                    timestamp: new Date().toISOString()
+                };
+                
+                await database.ref('chat').push(message);
+                input.value = '';
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showNotification('Error sending message', 'error');
             }
         }
 
@@ -911,6 +1494,11 @@
                 content.classList.remove('active');
             });
             document.getElementById(tabName).classList.add('active');
+            
+            // Load tab-specific data
+            if (tabName === 'mealprep') {
+                loadMealPhotos();
+            }
         }
 
         function showNotification(message, type = 'success') {
@@ -941,6 +1529,30 @@
             document.getElementById('daysRemaining').textContent = `Days left: ${remainingDays}`;
         }
 
+        // Event Listeners for Metric Inputs
+        function setupMetricInputs() {
+            const inputs = ['weightInput', 'cardioInput', 'proteinInput', 'waterInput', 'sleepInput'];
+            
+            inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                const metric = inputId.replace('Input', '');
+                
+                input.addEventListener('input', () => {
+                    const value = parseFloat(input.value) || 0;
+                    updateDailyMetric(metric, value);
+                    document.getElementById(metric + 'Value').textContent = value;
+                });
+            });
+            
+            // Chat input enter key
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
         // Page Visibility API for online status
         document.addEventListener('visibilitychange', () => {
             if (currentUser) {
@@ -959,8 +1571,9 @@
         window.addEventListener('load', () => {
             console.log('🚀 Starting FitSquad Pro...');
             updateGlobalProgress();
+            setupMetricInputs();
+            initMealUpload();
             
-            // Wait a bit for Firebase to load
             setTimeout(() => {
                 if (initializeFirebase()) {
                     console.log('✅ App initialized successfully');
