@@ -22,10 +22,16 @@ function initializeFirebase() {
         console.log('🔥 Initializing Firebase...');
         
         if (typeof firebase === 'undefined') {
-            throw new Error('Firebase SDK not loaded');
+            console.error('Firebase SDK not loaded');
+            updateFirebaseStatus('error');
+            return false;
         }
 
-        firebase.initializeApp(firebaseConfig);
+        // Check if already initialized
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
         auth = firebase.auth();
         database = firebase.database();
         storage = firebase.storage();
@@ -40,7 +46,10 @@ function initializeFirebase() {
     } catch (error) {
         console.error('❌ Firebase initialization failed:', error);
         updateFirebaseStatus('error');
-        ui.showNotification('Firebase initialization failed: ' + error.message, 'error');
+        // Show notification if ui is available
+        if (typeof ui !== 'undefined') {
+            ui.showNotification('Firebase initialization failed: ' + error.message, 'error');
+        }
         return false;
     }
 }
@@ -70,15 +79,17 @@ function handleAuthStateChange(user) {
     
     if (user) {
         currentUser = user;
-        ui.showMainApp();
-        dashboard.loadUserData();
-        dashboard.loadTodayData();
+        if (typeof ui !== 'undefined') ui.showMainApp();
+        if (typeof dashboard !== 'undefined') {
+            dashboard.loadUserData();
+            dashboard.loadTodayData();
+        }
         updateUserOnlineStatus(true);
-        chat.setupChatListener();
-        history.populateMonthPicker();
+        if (typeof chat !== 'undefined') chat.setupChatListener();
+        if (typeof history !== 'undefined') history.populateMonthPicker();
     } else {
         currentUser = null;
-        ui.showAuthScreen();
+        if (typeof ui !== 'undefined') ui.showAuthScreen();
     }
 }
 
