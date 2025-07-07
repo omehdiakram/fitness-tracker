@@ -21,6 +21,7 @@ let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 let selectedDate = new Date().toDateString();
 let historyData = {};
+let typingTimeout = null;
 
 // Initialize Firebase
 function initializeFirebase() {
@@ -651,6 +652,28 @@ function renderProgressChart() {
 }
 
 // Chat Functions
+function broadcastTyping(isTyping) {
+    if (!currentUser || !database) return;
+    database.ref(`users/${currentUser.uid}/typing`).set(isTyping);
+}
+
+function setupTypingListener() {
+    if (!database) return;
+    database.ref('users').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            const typingUsers = Object.values(users).filter(u => u.typing && u.isOnline && u.uid !== (currentUser ? currentUser.uid : null));
+            const indicator = document.getElementById('chatTypingIndicator');
+            if (typingUsers.length > 0) {
+                const names = typingUsers.map(u => u.nickname || u.name || 'User');
+                indicator.textContent = names.length === 1 ? `${names[0]} is typing...` : `${names.join(', ')} are typing...`;
+            } else {
+                indicator.textContent = '';
+            }
+        }
+    });
+}
+
 function setupChatListener() {
     if (!database) return;
     database.ref('chat').limitToLast(50).on('child_added', (snapshot) => {
@@ -667,6 +690,7 @@ function setupChatListener() {
             onlineDiv.innerHTML = onlineUsers.map(u => `<span class="chat-online-avatar" title="${u.name}">${(u.name||'U')[0]}</span>`).join(' ');
         }
     });
+    setupTypingListener();
 }
 
 function displayChatMessage(message) {
@@ -745,6 +769,7 @@ function showTab(tabName) {
         setTimeout(() => {
             const container = document.getElementById('chatMessages');
             container.scrollTop = container.scrollHeight;
+            setupChatInputTyping();
         }, 100);
     }
 }
@@ -828,6 +853,7 @@ window.addEventListener('load', () => {
             console.error('❌ App initialization failed');
         }
     }, 1000);
+    setupChatInputTyping();
 });
 
 // Add slideOut animation
@@ -1004,4 +1030,17 @@ async function loadLeaderboard() {
 const leaderboardTab = document.querySelector('button[onclick*="showTab(\'leaderboard\')"]');
 if (leaderboardTab) {
     leaderboardTab.addEventListener('click', loadLeaderboard);
+}
+
+// Enhance chat input to broadcast typing
+function setupChatInputTyping() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('input', () => {
+            broadcastTyping(true);
+            if (typingTimeout) clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => broadcastTyping(false), 2000);
+        });
+        chatInput.addEventListener('blur', () => broadcastTyping(false));
+    }
 } 
