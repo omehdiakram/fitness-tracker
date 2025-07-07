@@ -1,5 +1,5 @@
 // Dashboard Module
-const dashboard = {
+window.dashboard = {
     userData: {},
     dailyData: {},
     
