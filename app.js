@@ -89,15 +89,17 @@ function closeResetModal() {
 
 async function sendPasswordReset() {
     const email = document.getElementById('resetEmail').value.trim();
-    
     if (!email) {
-        showNotification('Please enter your email', 'error');
+        showNotification('Please enter your email address.', 'error');
         return;
     }
-    
+    if (!auth) {
+        showNotification('Firebase not initialized. Please refresh the page.', 'error');
+        return;
+    }
     try {
         await auth.sendPasswordResetEmail(email);
-        showNotification('Password reset link sent to your email', 'success');
+        showNotification('Password reset email sent! Check your inbox.', 'success');
         closeResetModal();
     } catch (error) {
         console.error('Password reset error:', error);
