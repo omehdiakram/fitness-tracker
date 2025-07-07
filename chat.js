@@ -1,5 +1,5 @@
 // Chat Module
-const chat = {
+window.chat = {
     isListening: false,
 
     // Setup chat listeners
