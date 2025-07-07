@@ -11,10 +11,10 @@ const firebaseConfig = {
 };
 
 // Global Firebase variables
-let auth = null;
-let database = null;
-let storage = null;
-let currentUser = null;
+window.auth = null;
+window.database = null;
+window.storage = null;
+window.currentUser = null;
 
 // Initialize Firebase
 function initializeFirebase() {
@@ -32,15 +32,15 @@ function initializeFirebase() {
             firebase.initializeApp(firebaseConfig);
         }
         
-        auth = firebase.auth();
-        database = firebase.database();
-        storage = firebase.storage();
+        window.auth = firebase.auth();
+        window.database = firebase.database();
+        window.storage = firebase.storage();
         
         console.log('✅ Firebase initialized successfully');
         updateFirebaseStatus('connected');
         
         // Set up auth state listener
-        auth.onAuthStateChanged(handleAuthStateChange);
+        window.auth.onAuthStateChanged(handleAuthStateChange);
         
         return true;
     } catch (error) {
@@ -78,7 +78,7 @@ function handleAuthStateChange(user) {
     console.log('🔄 Auth state changed:', user ? 'signed in' : 'signed out');
     
     if (user) {
-        currentUser = user;
+        window.currentUser = user;
         if (typeof ui !== 'undefined') ui.showMainApp();
         if (typeof dashboard !== 'undefined') {
             dashboard.loadUserData();
@@ -88,18 +88,18 @@ function handleAuthStateChange(user) {
         if (typeof chat !== 'undefined') chat.setupChatListener();
         if (typeof history !== 'undefined') history.populateMonthPicker();
     } else {
-        currentUser = null;
+        window.currentUser = null;
         if (typeof ui !== 'undefined') ui.showAuthScreen();
     }
 }
 
 async function updateUserOnlineStatus(isOnline) {
-    if (!currentUser || !database) return;
+    if (!window.currentUser || !window.database) return;
     
     try {
-        await database.ref(`users/${currentUser.uid}/isOnline`).set(isOnline);
+        await window.database.ref(`users/${window.currentUser.uid}/isOnline`).set(isOnline);
         if (isOnline) {
-            await database.ref(`users/${currentUser.uid}/lastActive`).set(new Date().toISOString());
+            await window.database.ref(`users/${window.currentUser.uid}/lastActive`).set(new Date().toISOString());
         }
     } catch (error) {
         console.error('Error updating online status:', error);
