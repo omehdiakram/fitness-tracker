@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitSquad Pro - Daily Fitness Tracker</title>
+    <title>الأبطال - Daily Fitness Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
@@ -865,7 +865,7 @@
     <!-- Authentication Screen -->
     <div id="authContainer" class="auth-container">
         <div class="auth-card">
-            <h1 class="auth-logo">FitSquad Pro</h1>
+            <h1 class="auth-logo">الأبطال</h1>
             <p class="auth-subtitle">Join the 20K DH Challenge</p>
             
             <!-- Login Form -->
@@ -933,7 +933,7 @@
     <div id="mainApp" class="app-container">
         <div class="header">
             <div class="header-content">
-                <h1>FitSquad Pro Challenge</h1>
+                <h1>الأبطال Challenge</h1>
                 <div class="header-stats">
                     <span>💰 Prize: 20,000 DH</span>
                     <span id="globalProgress">Progress: 9.6%</span>
@@ -1350,7 +1350,7 @@
                     await database.ref(`users/${user.uid}`).set(initialUserData);
                 }
                 
-                showNotification('Welcome to FitSquad Pro! 🎉', 'success');
+                showNotification('Welcome to الأبطال! 🎉', 'success');
                 
             } catch (error) {
                 console.error('Google sign-in error:', error);
@@ -2118,7 +2118,7 @@
 
         // Initialize when page loads
         window.addEventListener('load', () => {
-            console.log('🚀 Starting FitSquad Pro...');
+            console.log('🚀 Starting الأبطال...');
             updateGlobalProgress();
             setupMetricInputs();
             initMealUpload();
