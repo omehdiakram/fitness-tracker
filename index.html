@@ -28,15 +28,15 @@
                     <label class="form-label">Password</label>
                     <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
                 </div>
-                <button class="btn" onclick="auth.loginUser()">Sign In</button>
-                <button class="btn btn-secondary" onclick="auth.showRegisterForm()">Create Account</button>
-                <button class="btn btn-link" onclick="auth.showForgotPasswordForm()">Forgot Password?</button>
+                <button class="btn" onclick="loginUser()">Sign In</button>
+                <button class="btn btn-secondary" onclick="showRegisterForm()">Create Account</button>
+                <button class="btn btn-link" onclick="showForgotPasswordForm()">Forgot Password?</button>
                 
                 <div class="auth-divider">
                     <span>or</span>
                 </div>
                 
-                <button class="btn btn-google" onclick="auth.signInWithGoogle()">
+                <button class="btn" onclick="signInWithGoogle()">
                     Sign in with Google
                 </button>
             </div>
@@ -59,8 +59,8 @@
                     <label class="form-label">Squad Nickname</label>
                     <input type="text" class="form-input" id="registerNickname" placeholder="e.g., The Beast, The Machine">
                 </div>
-                <button class="btn" onclick="auth.registerUser()">Create Account</button>
-                <button class="btn btn-secondary" onclick="auth.showLoginForm()">Back to Sign In</button>
+                <button class="btn" onclick="registerUser()">Create Account</button>
+                <button class="btn btn-secondary" onclick="showLoginForm()">Back to Sign In</button>
             </div>
 
             <!-- Forgot Password Form -->
@@ -69,8 +69,8 @@
                     <label class="form-label">Email</label>
                     <input type="email" class="form-input" id="forgotEmail" placeholder="Enter your email">
                 </div>
-                <button class="btn" onclick="auth.resetPassword()">Send Reset Email</button>
-                <button class="btn btn-secondary" onclick="auth.showLoginForm()">Back to Sign In</button>
+                <button class="btn" onclick="resetPassword()">Send Reset Email</button>
+                <button class="btn btn-secondary" onclick="showLoginForm()">Back to Sign In</button>
             </div>
         </div>
     </div>
@@ -90,16 +90,15 @@
             <div class="user-menu">
                 <div class="user-avatar" id="userAvatar">U</div>
                 <span id="userName">User</span>
-                <button class="btn btn-sm" onclick="auth.signOut()">Sign Out</button>
+                <button class="btn btn-sm" onclick="signOut()">Sign Out</button>
             </div>
         </div>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="ui.showTab('dashboard')">Today</button>
-            <button class="nav-tab" onclick="ui.showTab('history')">History</button>
-            <button class="nav-tab" onclick="ui.showTab('mealprep')">Meal Prep</button>
-            <button class="nav-tab" onclick="ui.showTab('chat')">Squad Chat</button>
-            <button class="nav-tab" onclick="ui.showTab('leaderboard')">Leaderboard</button>
+            <button class="nav-tab active" onclick="showTab('dashboard')">Today</button>
+            <button class="nav-tab" onclick="showTab('mealprep')">Meal Prep</button>
+            <button class="nav-tab" onclick="showTab('chat')">Squad Chat</button>
+            <button class="nav-tab" onclick="showTab('leaderboard')">Leaderboard</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -174,7 +173,7 @@
                     <div class="metric-card meal-prep-card">
                         <div class="metric-icon">🍽️</div>
                         <div class="metric-label">Meal Prep</div>
-                        <div class="meal-upload-mini" onclick="mealPrep.showUploadModal()">
+                        <div class="meal-upload-mini" onclick="showTab('mealprep')">
                             <span>📸 Add Photo</span>
                         </div>
                         <div class="metric-value" id="mealPrepCount">0</div>
@@ -182,7 +181,7 @@
                 </div>
 
                 <div class="save-section">
-                    <button class="btn btn-save" onclick="dashboard.saveDailyData()">💾 Save Today's Progress</button>
+                    <button class="btn btn-save" onclick="saveDailyData()">💾 Save Today's Progress</button>
                     <div class="streak-display">
                         <span class="streak-icon">🔥</span>
                         <span class="streak-number" id="currentStreak">0</span>
@@ -228,8 +227,8 @@
             <div class="card">
                 <h3 class="card-title">📅 Progress History</h3>
                 <div class="history-controls">
-                    <input type="date" id="historyDatePicker" onchange="history.loadDateHistory()">
-                    <select id="historyMonthPicker" onchange="history.loadMonthHistory()">
+                    <input type="date" id="historyDatePicker" onchange="loadDateHistory()">
+                    <select id="historyMonthPicker" onchange="loadMonthHistory()">
                         <option value="">Select Month</option>
                     </select>
                 </div>
@@ -278,7 +277,7 @@
                 
                 <div class="chat-input-container">
                     <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1"></textarea>
-                    <button class="chat-send-btn" id="sendButton" onclick="chat.sendMessage()">
+                    <button class="chat-send-btn" id="sendButton" onclick="sendMessage()">
                         <span>➤</span>
                     </button>
                 </div>
@@ -335,6 +334,7 @@
     <script src="chat.js"></script>
     <script src="history.js"></script>
     <script src="ui.js"></script>
+    <script src="global-functions.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
