@@ -1,5 +1,5 @@
 // Meal Prep Module
-const mealPrep = {
+window.mealPrep = {
     selectedFile: null,
 
     // Initialize meal upload functionality
