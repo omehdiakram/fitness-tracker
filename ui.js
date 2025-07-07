@@ -1,5 +1,5 @@
 // UI Module
-const ui = {
+window.ui = {
     // Show authentication screen
     showAuthScreen() {
         document.getElementById('authContainer').style.display = 'flex';
