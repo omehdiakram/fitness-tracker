@@ -1,5 +1,5 @@
 // History Module
-const history = {
+window.history = {
     // Populate month picker
     populateMonthPicker() {
         const picker = document.getElementById('historyMonthPicker');
