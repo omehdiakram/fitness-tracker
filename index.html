@@ -252,7 +252,26 @@
                     <div><div class="profile-stat-label">BMI</div><div class="profile-stat-value" id="profileBMI">-</div></div>
                     <div><div class="profile-stat-label">Target Protein (g)</div><div class="profile-stat-value" id="profileProteinTarget">-</div></div>
                 </div>
-                <!-- Edit Profile Section -->
+                <!-- Macro Calculator Section -->
+                <div class="profile-macro-calculator card" style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px; margin: 24px 0; background: #fafbfc; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    <h4 style="margin-bottom: 12px;">Macro Calculator</h4>
+                    <div style="font-size: 0.95em; color: #888; margin-bottom: 12px;">Enter your details to estimate your daily macro targets. <b>Note:</b> This is for guidance only. Consult a professional for personalized advice.</div>
+                    <div class="macro-calc-fields" style="display: flex; flex-wrap: wrap; gap: 16px 24px; margin-bottom: 16px;">
+                        <label style="flex: 1 1 180px;">Weight (kg)<br><input type="number" id="macroWeight" min="30" max="250" step="0.1" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Height (cm)<br><input type="number" id="macroHeight" min="100" max="250" step="0.1" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Body Fat (%)<br><input type="number" id="macroBodyFat" min="0" max="60" step="0.1" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Age<br><input type="number" id="macroAge" min="10" max="100" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Activity Multiplier<br><input type="number" id="macroActivity" min="1.1" max="2.5" step="0.01" value="1.5" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Deficit (%)<br><input type="number" id="macroDeficit" min="0" max="50" step="1" value="10" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Protein Multiplier (g/lb LBM)<br><input type="number" id="macroProteinMult" min="0.5" max="2.5" step="0.01" value="1.2" class="form-input"></label>
+                        <label style="flex: 1 1 180px;">Fat (%)<br><input type="number" id="macroFatPct" min="10" max="50" step="1" value="25" class="form-input"></label>
+                        <label style="flex: 1 1 220px; margin-top: 24px;"><input type="checkbox" id="macroKatch"> Use Katch-McArdle (LBM-based BMR)</label>
+                    </div>
+                    <button class="btn" id="macroCalcBtn" style="margin-bottom: 12px;">Calculate Macros</button>
+                    <div id="macroCalcResult" class="macro-calc-result" style="margin-top: 12px; font-size: 1.05em;"></div>
+                    <button class="btn btn-secondary" id="macroSaveBtn" style="display:none; margin-top: 8px;">Save Macros to Profile</button>
+                </div>
+                <!-- End Macro Calculator Section -->
                 <div class="profile-edit">
                     <h4>Edit Profile</h4>
                     <div class="profile-edit-fields">

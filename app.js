@@ -23,6 +23,70 @@ let selectedDate = new Date().toDateString();
 let historyData = {};
 let typingTimeout = null;
 
+// Macro Calculator Function (JS version of provided Python)
+function calculateMacros({
+    weightKg,
+    heightCm,
+    bodyFatPercentage,
+    age,
+    activityMultiplier = 1.5,
+    deficitPercentage = 10,
+    proteinMultiplier = 1.2,
+    fatPercentage = 25,
+    useKatchMcArdle = false
+}) {
+    // Convert weight
+    const weightLbs = weightKg * 2.20462;
+    // Lean Body Mass in lbs
+    const lbmLbs = weightLbs * (1 - bodyFatPercentage / 100);
+    const lbmKg = lbmLbs / 2.20462;
+
+    // Estimate BMR
+    let bmr;
+    if (useKatchMcArdle) {
+        bmr = 370 + 21.6 * lbmKg;
+    } else {
+        bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5; // Mifflin-St Jeor (male)
+    }
+
+    // TDEE
+    const maintenanceCalories = bmr * activityMultiplier;
+    // Calorie goal
+    const calorieGoal = maintenanceCalories * (1 - deficitPercentage / 100);
+
+    // Protein
+    const proteinG = lbmLbs * proteinMultiplier;
+    const proteinCal = proteinG * 4;
+
+    // Fat
+    const fatCal = calorieGoal * (fatPercentage / 100);
+    const fatG = fatCal / 9;
+
+    // Carbs
+    const remainingCal = calorieGoal - proteinCal - fatCal;
+    if (remainingCal < 0) {
+        throw new Error('Protein + fat calories exceed total calories. Reduce protein multiplier or fat percentage.');
+    }
+    const carbG = remainingCal / 4;
+
+    return {
+        LBM_lbs: Math.round(lbmLbs * 100) / 100,
+        BMR_cal_per_day: Math.round(bmr * 100) / 100,
+        Maintenance_cal_per_day: Math.round(maintenanceCalories * 100) / 100,
+        Calorie_goal_per_day: Math.round(calorieGoal * 100) / 100,
+        Protein_g: Math.round(proteinG * 100) / 100,
+        Fat_g: Math.round(fatG * 100) / 100,
+        Carb_g: Math.round(carbG * 100) / 100
+    };
+}
+
+// Save calculated macros to user profile in Firebase
+async function saveUserMacros(macros) {
+    if (!currentUser || !database) return;
+    await database.ref(`users/${currentUser.uid}/macroTargets`).set(macros);
+    showNotification('Macro targets saved to your profile!', 'success');
+}
+
 // Initialize Firebase
 function initializeFirebase() {
     try {
@@ -371,6 +435,14 @@ function updateDailyInterface() {
     document.getElementById('caloriesValue').textContent = dailyData.calories || '0';
 
     updateDailyProgress();
+
+    // Auto-populate macros if user has saved targets and fields are empty
+    if (userData && userData.macroTargets) {
+        if (!dailyData.protein) dailyData.protein = Math.round(userData.macroTargets.Protein_g);
+        if (!dailyData.fats) dailyData.fats = Math.round(userData.macroTargets.Fat_g);
+        if (!dailyData.carbs) dailyData.carbs = Math.round(userData.macroTargets.Carb_g);
+        if (!dailyData.calories) dailyData.calories = Math.round(userData.macroTargets.Calorie_goal_per_day);
+    }
 }
 
 async function updateDailyMetric(metric, value) {
@@ -928,6 +1000,82 @@ function updateProfileSection() {
     let proteinTargetLow = (latestWeight && userData.height) ? Math.round(latestWeight * 1.8) : '-';
     let proteinTargetHigh = (latestWeight && userData.height) ? Math.round(latestWeight * 2.2) : '-';
     document.getElementById('profileProteinTarget').textContent = (proteinTargetLow !== '-' && proteinTargetHigh !== '-') ? `${proteinTargetLow} - ${proteinTargetHigh}` : '-';
+
+    // Macro Calculator UI
+    const macroWeightInput = document.getElementById('macroWeight');
+    const macroHeightInput = document.getElementById('macroHeight');
+    const macroBodyFatInput = document.getElementById('macroBodyFat');
+    const macroAgeInput = document.getElementById('macroAge');
+    const macroActivityInput = document.getElementById('macroActivity');
+    const macroDeficitInput = document.getElementById('macroDeficit');
+    const macroProteinMultInput = document.getElementById('macroProteinMult');
+    const macroFatPctInput = document.getElementById('macroFatPct');
+    const macroKatchInput = document.getElementById('macroKatch');
+    const macroCalcBtn = document.getElementById('macroCalcBtn');
+    const macroResultDiv = document.getElementById('macroCalcResult');
+    const macroSaveBtn = document.getElementById('macroSaveBtn');
+
+    // Pre-fill with user data if available
+    if (userData) {
+        if (userData.height) macroHeightInput.value = userData.height;
+        if (userData.age) macroAgeInput.value = userData.age;
+        if (userData.weight) macroWeightInput.value = userData.weight;
+        if (userData.bodyFat) macroBodyFatInput.value = userData.bodyFat;
+    }
+
+    let lastMacros = null;
+
+    macroCalcBtn.onclick = function() {
+        // Read values
+        const weight = parseFloat(macroWeightInput.value);
+        const height = parseFloat(macroHeightInput.value);
+        const bodyFat = parseFloat(macroBodyFatInput.value);
+        const age = parseInt(macroAgeInput.value);
+        const activity = parseFloat(macroActivityInput.value) || 1.5;
+        const deficit = parseFloat(macroDeficitInput.value) || 10;
+        const proteinMult = parseFloat(macroProteinMultInput.value) || 1.2;
+        const fatPct = parseFloat(macroFatPctInput.value) || 25;
+        const useKatch = macroKatchInput.checked;
+        if (isNaN(weight) || isNaN(height) || isNaN(bodyFat) || isNaN(age)) {
+            macroResultDiv.innerHTML = '<span style="color:red">Please fill in all required fields.</span>';
+            macroSaveBtn.style.display = 'none';
+            return;
+        }
+        try {
+            const macros = calculateMacros({
+                weightKg: weight,
+                heightCm: height,
+                bodyFatPercentage: bodyFat,
+                age: age,
+                activityMultiplier: activity,
+                deficitPercentage: deficit,
+                proteinMultiplier: proteinMult,
+                fatPercentage: fatPct,
+                useKatchMcArdle: useKatch
+            });
+            lastMacros = macros;
+            macroResultDiv.innerHTML = `
+                <b>Results:</b><br>
+                LBM: ${macros.LBM_lbs} lbs<br>
+                BMR: ${macros.BMR_cal_per_day} kcal<br>
+                Maintenance: ${macros.Maintenance_cal_per_day} kcal<br>
+                Calorie Goal: ${macros.Calorie_goal_per_day} kcal<br>
+                Protein: ${macros.Protein_g} g<br>
+                Fat: ${macros.Fat_g} g<br>
+                Carbs: ${macros.Carb_g} g
+            `;
+            macroSaveBtn.style.display = '';
+        } catch (e) {
+            macroResultDiv.innerHTML = `<span style='color:red'>${e.message}</span>`;
+            macroSaveBtn.style.display = 'none';
+        }
+    };
+    macroSaveBtn.onclick = async function() {
+        if (lastMacros) {
+            await saveUserMacros(lastMacros);
+            macroSaveBtn.style.display = 'none';
+        }
+    };
 }
 
 // Save height when changed
@@ -1044,3 +1192,202 @@ function setupChatInputTyping() {
         chatInput.addEventListener('blur', () => broadcastTyping(false));
     }
 } 
+
+// Macro Calculator UI Logic
+function setupMacroCalculatorUI() {
+    // Profile tab
+    const weightInput = document.getElementById('macroWeight');
+    const heightInput = document.getElementById('macroHeight');
+    const bodyFatInput = document.getElementById('macroBodyFat');
+    const ageInput = document.getElementById('macroAge');
+    const activityInput = document.getElementById('macroActivity');
+    const deficitInput = document.getElementById('macroDeficit');
+    const proteinMultInput = document.getElementById('macroProteinMult');
+    const fatPctInput = document.getElementById('macroFatPct');
+    const katchInput = document.getElementById('macroKatch');
+    const calcBtn = document.getElementById('macroCalcBtn');
+    const resultDiv = document.getElementById('macroCalcResult');
+    const saveBtn = document.getElementById('macroSaveBtn');
+
+    // Pre-fill with user data if available
+    if (userData) {
+        if (userData.height) heightInput.value = userData.height;
+        if (userData.age) ageInput.value = userData.age;
+        if (userData.weight) weightInput.value = userData.weight;
+        if (userData.bodyFat) bodyFatInput.value = userData.bodyFat;
+    }
+
+    let lastMacros = null;
+
+    calcBtn.onclick = function() {
+        // Read values
+        const weight = parseFloat(weightInput.value);
+        const height = parseFloat(heightInput.value);
+        const bodyFat = parseFloat(bodyFatInput.value);
+        const age = parseInt(ageInput.value);
+        const activity = parseFloat(activityInput.value) || 1.5;
+        const deficit = parseFloat(deficitInput.value) || 10;
+        const proteinMult = parseFloat(proteinMultInput.value) || 1.2;
+        const fatPct = parseFloat(fatPctInput.value) || 25;
+        const useKatch = katchInput.checked;
+        if (isNaN(weight) || isNaN(height) || isNaN(bodyFat) || isNaN(age)) {
+            resultDiv.innerHTML = '<span style="color:red">Please fill in all required fields.</span>';
+            saveBtn.style.display = 'none';
+            return;
+        }
+        try {
+            const macros = calculateMacros({
+                weightKg: weight,
+                heightCm: height,
+                bodyFatPercentage: bodyFat,
+                age: age,
+                activityMultiplier: activity,
+                deficitPercentage: deficit,
+                proteinMultiplier: proteinMult,
+                fatPercentage: fatPct,
+                useKatchMcArdle: useKatch
+            });
+            lastMacros = macros;
+            resultDiv.innerHTML = `
+                <b>Results:</b><br>
+                LBM: ${macros.LBM_lbs} lbs<br>
+                BMR: ${macros.BMR_cal_per_day} kcal<br>
+                Maintenance: ${macros.Maintenance_cal_per_day} kcal<br>
+                Calorie Goal: ${macros.Calorie_goal_per_day} kcal<br>
+                Protein: ${macros.Protein_g} g<br>
+                Fat: ${macros.Fat_g} g<br>
+                Carbs: ${macros.Carb_g} g
+            `;
+            saveBtn.style.display = '';
+        } catch (e) {
+            resultDiv.innerHTML = `<span style='color:red'>${e.message}</span>`;
+            saveBtn.style.display = 'none';
+        }
+    };
+    saveBtn.onclick = async function() {
+        if (lastMacros) {
+            await saveUserMacros(lastMacros);
+            saveBtn.style.display = 'none';
+        }
+    };
+}
+
+// Add Macro Calculator to Dashboard
+function injectDashboardMacroCalculator() {
+    const dashboard = document.getElementById('dashboard');
+    if (!dashboard || document.getElementById('dashboardMacroCalc')) return;
+    // Insert after daily-metrics
+    const metrics = dashboard.querySelector('.daily-metrics');
+    const macroDiv = document.createElement('div');
+    macroDiv.className = 'dashboard-macro-calculator card';
+    macroDiv.id = 'dashboardMacroCalc';
+    macroDiv.innerHTML = `
+        <h4>Macro Calculator</h4>
+        <div class="macro-calc-fields">
+            <label>Weight (kg) <input type="number" id="dashMacroWeight" min="30" max="250" step="0.1"></label>
+            <label>Height (cm) <input type="number" id="dashMacroHeight" min="100" max="250" step="0.1"></label>
+            <label>Body Fat (%) <input type="number" id="dashMacroBodyFat" min="0" max="60" step="0.1"></label>
+            <label>Age <input type="number" id="dashMacroAge" min="10" max="100"></label>
+            <label>Activity Multiplier <input type="number" id="dashMacroActivity" min="1.1" max="2.5" step="0.01" value="1.5"></label>
+            <label>Deficit (%) <input type="number" id="dashMacroDeficit" min="0" max="50" step="1" value="10"></label>
+            <label>Protein Multiplier (g/lb LBM) <input type="number" id="dashMacroProteinMult" min="0.5" max="2.5" step="0.01" value="1.2"></label>
+            <label>Fat (%) <input type="number" id="dashMacroFatPct" min="10" max="50" step="1" value="25"></label>
+            <label><input type="checkbox" id="dashMacroKatch"> Use Katch-McArdle (LBM-based BMR)</label>
+        </div>
+        <button class="btn" id="dashMacroCalcBtn">Calculate Macros</button>
+        <div id="dashMacroCalcResult" class="macro-calc-result" style="margin-top: 12px;"></div>
+        <button class="btn btn-secondary" id="dashMacroSaveBtn" style="display:none; margin-top: 8px;">Save Macros to Profile</button>
+    `;
+    metrics.parentNode.insertBefore(macroDiv, metrics.nextSibling);
+
+    // Setup logic (reuse)
+    const weightInput = document.getElementById('dashMacroWeight');
+    const heightInput = document.getElementById('dashMacroHeight');
+    const bodyFatInput = document.getElementById('dashMacroBodyFat');
+    const ageInput = document.getElementById('dashMacroAge');
+    const activityInput = document.getElementById('dashMacroActivity');
+    const deficitInput = document.getElementById('dashMacroDeficit');
+    const proteinMultInput = document.getElementById('dashMacroProteinMult');
+    const fatPctInput = document.getElementById('dashMacroFatPct');
+    const katchInput = document.getElementById('dashMacroKatch');
+    const calcBtn = document.getElementById('dashMacroCalcBtn');
+    const resultDiv = document.getElementById('dashMacroCalcResult');
+    const saveBtn = document.getElementById('dashMacroSaveBtn');
+
+    // Pre-fill with user data if available
+    if (userData) {
+        if (userData.height) heightInput.value = userData.height;
+        if (userData.age) ageInput.value = userData.age;
+        if (userData.weight) weightInput.value = userData.weight;
+        if (userData.bodyFat) bodyFatInput.value = userData.bodyFat;
+    }
+
+    let lastMacros = null;
+
+    calcBtn.onclick = function() {
+        // Read values
+        const weight = parseFloat(weightInput.value);
+        const height = parseFloat(heightInput.value);
+        const bodyFat = parseFloat(bodyFatInput.value);
+        const age = parseInt(ageInput.value);
+        const activity = parseFloat(activityInput.value) || 1.5;
+        const deficit = parseFloat(deficitInput.value) || 10;
+        const proteinMult = parseFloat(proteinMultInput.value) || 1.2;
+        const fatPct = parseFloat(fatPctInput.value) || 25;
+        const useKatch = katchInput.checked;
+        if (isNaN(weight) || isNaN(height) || isNaN(bodyFat) || isNaN(age)) {
+            resultDiv.innerHTML = '<span style="color:red">Please fill in all required fields.</span>';
+            saveBtn.style.display = 'none';
+            return;
+        }
+        try {
+            const macros = calculateMacros({
+                weightKg: weight,
+                heightCm: height,
+                bodyFatPercentage: bodyFat,
+                age: age,
+                activityMultiplier: activity,
+                deficitPercentage: deficit,
+                proteinMultiplier: proteinMult,
+                fatPercentage: fatPct,
+                useKatchMcArdle: useKatch
+            });
+            lastMacros = macros;
+            resultDiv.innerHTML = `
+                <b>Results:</b><br>
+                LBM: ${macros.LBM_lbs} lbs<br>
+                BMR: ${macros.BMR_cal_per_day} kcal<br>
+                Maintenance: ${macros.Maintenance_cal_per_day} kcal<br>
+                Calorie Goal: ${macros.Calorie_goal_per_day} kcal<br>
+                Protein: ${macros.Protein_g} g<br>
+                Fat: ${macros.Fat_g} g<br>
+                Carbs: ${macros.Carb_g} g
+            `;
+            saveBtn.style.display = '';
+        } catch (e) {
+            resultDiv.innerHTML = `<span style='color:red'>${e.message}</span>`;
+            saveBtn.style.display = 'none';
+        }
+    };
+    saveBtn.onclick = async function() {
+        if (lastMacros) {
+            await saveUserMacros(lastMacros);
+            saveBtn.style.display = 'none';
+        }
+    };
+}
+
+// Call setup on load and after userData loads
+window.addEventListener('load', () => {
+    setupMacroCalculatorUI();
+});
+// Also call after userData loads
+function afterUserDataLoaded() {
+    setupMacroCalculatorUI();
+}
+// Patch loadUserData to call afterUserDataLoaded
+const origLoadUserData = loadUserData;
+loadUserData = async function() {
+    await origLoadUserData.apply(this, arguments);
+    afterUserDataLoaded();
+}; 
