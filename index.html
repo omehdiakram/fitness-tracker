@@ -4,7 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الأبطال - Daily Fitness Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">\
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const carousel = document.querySelector('.macro-guide-carousel');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.querySelector('.carousel-dots');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+
+        // Create dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+        const dots = document.querySelectorAll('.dot');
+
+        function updateCarousel() {
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+
+            // Update buttons
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === totalSlides - 1;
+            
+            // Change last button text
+            if (currentIndex === totalSlides - 1) {
+                nextBtn.textContent = "Let's Calculate!";
+                nextBtn.onclick = () => {
+                   const calculator = document.querySelector('.profile-macro-calculator');
+                   if(calculator) calculator.scrollIntoView({ behavior: 'smooth' });
+                };
+            } else {
+                nextBtn.textContent = "Next →";
+                nextBtn.onclick = () => goToSlide(currentIndex + 1);
+            }
+        }
+
+        function goToSlide(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                goToSlide(currentIndex - 1);
+            }
+        });
+        
+        // Initial setup for next button
+        nextBtn.onclick = () => goToSlide(currentIndex + 1);
+
+        // Initialize
+        updateCarousel();
+    });
+</script>
 </head>
 <body>
     <!-- Firebase Connection Status -->
@@ -98,6 +161,7 @@
             <button class="nav-tab" onclick="showTab('profile')">Profile</button>
             <button class="nav-tab" onclick="showTab('chat')">Squad Chat</button>
             <button class="nav-tab" onclick="showTab('leaderboard')">Leaderboard</button>
+            <button class="nav-tab" onclick="showTab('calculator')">Macros Calculator</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -252,26 +316,6 @@
                     <div><div class="profile-stat-label">BMI</div><div class="profile-stat-value" id="profileBMI">-</div></div>
                     <div><div class="profile-stat-label">Target Protein (g)</div><div class="profile-stat-value" id="profileProteinTarget">-</div></div>
                 </div>
-                <!-- Macro Calculator Section -->
-                <div class="profile-macro-calculator card" style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px; margin: 24px 0; background: #fafbfc; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                    <h4 style="margin-bottom: 12px;">Macro Calculator</h4>
-                    <div style="font-size: 0.95em; color: #888; margin-bottom: 12px;">Enter your details to estimate your daily macro targets. <b>Note:</b> This is for guidance only. Consult a professional for personalized advice.</div>
-                    <div class="macro-calc-fields" style="display: flex; flex-wrap: wrap; gap: 16px 24px; margin-bottom: 16px;">
-                        <label style="flex: 1 1 180px;">Weight (kg)<br><input type="number" id="macroWeight" min="30" max="250" step="0.1" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Height (cm)<br><input type="number" id="macroHeight" min="100" max="250" step="0.1" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Body Fat (%)<br><input type="number" id="macroBodyFat" min="0" max="60" step="0.1" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Age<br><input type="number" id="macroAge" min="10" max="100" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Activity Multiplier<br><input type="number" id="macroActivity" min="1.1" max="2.5" step="0.01" value="1.5" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Deficit (%)<br><input type="number" id="macroDeficit" min="0" max="50" step="1" value="10" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Protein Multiplier (g/lb LBM)<br><input type="number" id="macroProteinMult" min="0.5" max="2.5" step="0.01" value="1.2" class="form-input"></label>
-                        <label style="flex: 1 1 180px;">Fat (%)<br><input type="number" id="macroFatPct" min="10" max="50" step="1" value="25" class="form-input"></label>
-                        <label style="flex: 1 1 220px; margin-top: 24px;"><input type="checkbox" id="macroKatch"> Use Katch-McArdle (LBM-based BMR)</label>
-                    </div>
-                    <button class="btn" id="macroCalcBtn" style="margin-bottom: 12px;">Calculate Macros</button>
-                    <div id="macroCalcResult" class="macro-calc-result" style="margin-top: 12px; font-size: 1.05em;"></div>
-                    <button class="btn btn-secondary" id="macroSaveBtn" style="display:none; margin-top: 8px;">Save Macros to Profile</button>
-                </div>
-                <!-- End Macro Calculator Section -->
                 <div class="profile-edit">
                     <h4>Edit Profile</h4>
                     <div class="profile-edit-fields">
@@ -308,6 +352,126 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- ***** 3. NEW CALCULATOR TAB ADDED ***** -->
+        <div id="calculator" class="tab-content">
+            <!-- Macro Calculator Carousel Section -->
+            <div class="macro-guide-container">
+                <div class="macro-guide-carousel-wrapper" style="overflow: hidden;">
+                    <div class="macro-guide-carousel">
+
+                        <!-- SLIDE 1: PERSONAL DETAILS -->
+                        <div class="carousel-slide">
+                            <h3>Step 1: Your Personal Details</h3>
+                            <p class="slide-subtitle">Let's start with the basics. Please use metric units for accuracy.</p>
+                            <div class="slide-input-grid">
+                                <label>Weight (kg)<br><input type="number" id="macroWeight" min="30" max="250" step="0.1" class="form-input"></label>
+                                <label>Height (cm)<br><input type="number" id="macroHeight" min="100" max="250" step="0.1" class="form-input"></label>
+                                <label>Age<br><input type="number" id="macroAge" min="10" max="100" class="form-input"></label>
+                                <label>Body Fat (%)<br><input type="number" id="macroBodyFat" min="0" max="60" step="0.1" class="form-input"></label>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 2: PROTEIN INTAKE -->
+                        <div class="carousel-slide">
+                            <h3>Step 2: Protein Intake</h3>
+                            <p class="slide-subtitle">Use the sliding scale below to set your protein multiplier based on your body fat %.</p>
+                            <div class="slide-content">
+                                <div class="content-text">
+                                    <h4>How to Choose:</h4>
+                                    <p>If you have <strong>higher body fat</strong>, a multiplier closer to <strong>1.2</strong> is ideal.</p>
+                                    <p>If you are <strong>leaner</strong>, aim for a value closer to <strong>1.6</strong> to preserve muscle.</p>
+                                    <label><strong>Protein Multiplier (g/lb LBM)</strong><br>
+                                    <input type="number" id="macroProteinMult" min="0.5" max="2.5" step="0.01" value="1.2" class="form-input">
+                                    </label>
+                                </div>
+                                <div class="content-visual">
+                                    <div class="protein-visual">
+                                        <div class="protein-labels"><span>HIGH BODY FAT %</span><span>LOW BODY FAT %</span></div>
+                                        <div class="arrow"></div>
+                                        <div class="protein-values"><span>1.2 G/LB LBM</span><span>1.6 G/LB LBM</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 3: ACTIVITY LEVEL -->
+                        <div class="carousel-slide">
+                            <h3>Step 3: Activity Level</h3>
+                            <p class="slide-subtitle">Select a multiplier that reflects your daily activity outside of training.</p>
+                            <div class="slide-content">
+                                <div class="content-text">
+                                    <h4>How to Choose:</h4>
+                                    <p>Match your lifestyle to the descriptions in the table and enter a corresponding value.</p>
+                                    <label><strong>Activity Multiplier</strong><br>
+                                        <input type="number" id="macroActivity" min="1.1" max="2.5" step="0.01" value="1.5" class="form-input">
+                                    </label>
+                                </div>
+                                <div class="content-visual">
+                                    <table class="activity-table">
+                                        <thead><tr><th>Lifestyle Example</th><th>Multiplier</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>Desk job, little extra activity</td><td><strong>1.2 - 1.5</strong></td></tr>
+                                            <tr><td>Desk job + daily walks</td><td><strong>1.5 - 1.8</strong></td></tr>
+                                            <tr><td>Active job (e.g., waitress)</td><td><strong>1.8 - 2.0</strong></td></tr>
+                                            <tr><td>Manual labor (e.g., construction)</td><td><strong>2.0 - 2.2</strong></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SLIDE 4: GOALS & DIETARY FAT -->
+                        <div class="carousel-slide">
+                            <h3>Step 4: Goals & Dietary Fat</h3>
+                            <p class="slide-subtitle">Finally, let's set your fat intake and calorie deficit to match your goals.</p>
+                            <div class="slide-input-grid grid-2-col">
+                                <div class="input-card">
+                                    <h4>Fat Percentage (%)</h4>
+                                    <p>We recommend <strong>20-35%</strong> to support hormonal health. 25% is a great starting point.</p>
+                                    <label><input type="number" id="macroFatPct" min="10" max="50" step="1" value="25" class="form-input"></label>
+                                </div>
+                                <div class="input-card">
+                                    <h4>Deficit (%)</h4>
+                                    <p>A <strong>0-10%</strong> deficit is good for recomposition. Use <strong>15-25%</strong> for focused fat loss.</p>
+                                    <label><input type="number" id="macroDeficit" min="0" max="50" step="1" value="10" class="form-input"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 5: CALCULATE -->
+                        <div class="carousel-slide">
+                            <h3>Final Step: Calculate Your Macros</h3>
+                            <p class="slide-subtitle">One last check, and you're ready to see your results!</p>
+                            
+                            <div class="final-check-box">
+                                <label>
+                                    <input type="checkbox" id="macroKatch"> 
+                                    <strong>Use Katch-McArdle (Recommended)</strong>
+                                </label>
+                                <p>Check this box for the most accurate BMR calculation based on your Lean Body Mass.</p>
+                            </div>
+                            
+                            <div class="calculation-area">
+                                <button class="btn btn-calculate" id="macroCalcBtn">Calculate My Macros</button>
+                                <div id="macroCalcResult" class="macro-calc-result"></div>
+                                <button class="btn btn-secondary btn-save" id="macroSaveBtn" style="display:none;">Save Macros to Profile</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- CAROUSEL NAVIGATION -->
+                <div class="carousel-navigation">
+                    <button class="nav-btn" id="prevBtn" disabled>← Previous</button>
+                    <div class="carousel-dots"></div>
+                    <button class="nav-btn" id="nextBtn">Next →</button>
+                </div>
+            </div>
+        </div>
+        <!-- End New Calculator Tab -->
 
         <!-- Chat Tab -->
         <div id="chat" class="tab-content">
