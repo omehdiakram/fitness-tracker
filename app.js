@@ -340,6 +340,11 @@ async function loadUserData() {
         const snapshot = await database.ref(`users/${currentUser.uid}`).once('value');
         if (snapshot.exists()) {
             userData = snapshot.val();
+            // Ensure streak is loaded
+            if (userData.streak === undefined) {
+                const streakSnap = await database.ref(`users/${currentUser.uid}/streak`).once('value');
+                userData.streak = streakSnap.exists() ? streakSnap.val() : 0;
+            }
             updateUserInterface();
             // If height is present, update profile
             if (userData.height) {
@@ -559,6 +564,20 @@ async function updateStreak() {
 
 // History Logs Functions
 function renderHistoryLogs() {
+    const macroTargets = userData && userData.macroTargets ? userData.macroTargets : null;
+    const getRec = (key) => macroTargets ? Math.round(macroTargets[key]) : '-';
+    const getConclusion = (entry) => {
+        let msg = [];
+        if (macroTargets) {
+            if (entry.protein < macroTargets.Protein_g) msg.push('Increase protein');
+            if (entry.carbs > macroTargets.Carb_g) msg.push('Reduce carbs');
+            if (entry.fats > macroTargets.Fat_g) msg.push('Reduce fats');
+            if (entry.calories > macroTargets.Calorie_goal_per_day) msg.push('Reduce calories');
+            if (msg.length === 0) return 'Great job! You hit your targets.';
+            return 'Recommendations: ' + msg.join(', ');
+        }
+        return 'No recommendations (set your macro targets).';
+    };
     const logList = document.getElementById('historyLogList');
     logList.innerHTML = '';
     if (!userData.dailyMetrics) return;
@@ -572,22 +591,25 @@ function renderHistoryLogs() {
         const entry = userData.dailyMetrics[date];
         // Use that day's weight or latestWeight
         const weight = entry.weight ? Number(entry.weight) : latestWeight;
-        const proteinTarget = weight ? Math.round(weight * 1.8) : null;
-        const proteinSatisfied = (proteinTarget && entry.protein && entry.protein >= proteinTarget);
+        const proteinTarget = getRec('Protein_g');
+        const carbTarget = getRec('Carb_g');
+        const fatTarget = getRec('Fat_g');
+        const calTarget = getRec('Calorie_goal_per_day');
         const log = document.createElement('div');
         log.className = 'history-log-item' + (date === selectedDate ? ' active' : '');
         log.innerHTML = `
             <div class="history-log-date">${new Date(date).toLocaleDateString()}</div>
             <div class="history-log-summary">
                 <span>Points: ${entry.points || 0}</span>
-                <span>Weight: ${entry.weight || '-'}</span>
+                <span>Weight: ${entry.weight || '-'} (rec: -)</span>
+                <span>Protein: ${entry.protein || 0}g (rec: ${proteinTarget})</span>
+                <span>Carbs: ${entry.carbs || 0}g (rec: ${carbTarget})</span>
+                <span>Fats: ${entry.fats || 0}g (rec: ${fatTarget})</span>
+                <span>Calories: ${entry.calories || 0} (rec: ${calTarget})</span>
                 <span>Training: ${entry.training ? '\u2705' : '\u274c'}</span>
-                <span>Protein: ${proteinSatisfied ? 'Satisfied \u2705' : 'Not satisfied \u274c'}</span>
                 <span>Mood: ${entry.mood ? entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1) : '-'}</span>
-                <span>Carbs: ${entry.carbs || 0}g</span>
-                <span>Fats: ${entry.fats || 0}g</span>
-                <span>Calories: ${entry.calories || 0}</span>
             </div>
+            <div class="history-log-conclusion" style="margin-top: 6px; color: #2d7a2d; font-weight: 500;">${getConclusion(entry)}</div>
         `;
         log.onclick = () => {
             selectedDate = date;
@@ -1390,4 +1412,197 @@ const origLoadUserData = loadUserData;
 loadUserData = async function() {
     await origLoadUserData.apply(this, arguments);
     afterUserDataLoaded();
+}; 
+
+// 1. Fix Daily Logs: Ensure loadHistoryData is called after saving daily data and after login, and that userData.dailyMetrics is always updated
+// 2. Auto-calculate calories from macros
+// 3. Restrict saveDailyData to one save per day
+
+// --- 1. Fix Daily Logs ---
+// Already called after save and on login, but ensure userData.dailyMetrics is always updated
+// Patch loadTodayData to call loadHistoryData after loading
+const origLoadTodayData = loadTodayData;
+loadTodayData = async function() {
+    await origLoadTodayData.apply(this, arguments);
+    loadHistoryData();
+};
+
+// --- 2. Auto-calculate calories from macros ---
+function autoCalculateCalories() {
+    const protein = parseFloat(document.getElementById('proteinInput').value) || 0;
+    const carbs = parseFloat(document.getElementById('carbsInput').value) || 0;
+    const fats = parseFloat(document.getElementById('fatsInput').value) || 0;
+    return Math.round(protein * 4 + carbs * 4 + fats * 9);
+}
+
+// Patch updateDailyInterface to auto-calculate calories
+const origUpdateDailyInterface = updateDailyInterface;
+updateDailyInterface = function() {
+    origUpdateDailyInterface.apply(this, arguments);
+    // If protein/carb/fat are present, auto-calc calories
+    const protein = parseFloat(document.getElementById('proteinInput').value) || 0;
+    const carbs = parseFloat(document.getElementById('carbsInput').value) || 0;
+    const fats = parseFloat(document.getElementById('fatsInput').value) || 0;
+    if (protein || carbs || fats) {
+        const calories = autoCalculateCalories();
+        document.getElementById('caloriesInput').value = calories;
+        document.getElementById('caloriesValue').textContent = calories;
+        dailyData.calories = calories;
+    }
+};
+
+// --- 3. Restrict saveDailyData to one save per day ---
+const origSaveDailyData = saveDailyData;
+saveDailyData = async function() {
+    const today = new Date().toDateString();
+    if (dailyData && dailyData.savedForDay === today) {
+        showNotification('You have already saved your stats for today!', 'info');
+        return;
+    }
+    // Only first save: update streak and points
+    if (!dailyData.savedForDay || dailyData.savedForDay !== today) {
+        await origSaveDailyData.apply(this, arguments);
+        dailyData.savedForDay = today;
+        document.getElementById('saveDailyBtn').disabled = true;
+        document.getElementById('saveDailyBtn').innerHTML = '<span>✅</span> Saved!';
+    }
+}; 
+
+// Add updateDailyData for updating stats without affecting streak/points
+async function updateDailyData() {
+    if (!currentUser || !database) return;
+    const today = new Date().toDateString();
+    // Collect all metrics
+    const updatedData = {
+        weight: parseFloat(document.getElementById('weightInput').value) || '',
+        cardio: parseFloat(document.getElementById('cardioInput').value) || '',
+        protein: parseFloat(document.getElementById('proteinInput').value) || '',
+        water: parseFloat(document.getElementById('waterInput').value) || '',
+        sleep: parseFloat(document.getElementById('sleepInput').value) || '',
+        training: document.getElementById('trainingCheck').checked,
+        mealprep: document.getElementById('mealprepCheck').checked,
+        mood: document.getElementById('moodInput').value || '',
+        carbs: parseFloat(document.getElementById('carbsInput').value) || '',
+        fats: parseFloat(document.getElementById('fatsInput').value) || '',
+        calories: parseFloat(document.getElementById('caloriesInput').value) || '',
+        date: today,
+        timestamp: new Date().toISOString()
+    };
+    // Only update metrics, not points or streak
+    await database.ref(`users/${currentUser.uid}/dailyMetrics/${today}`).update(updatedData);
+    showNotification('Daily stats updated!', 'success');
+    loadHistoryData();
+}
+// Update Update button to use updateDailyData
+function setupUpdateDailyButton() {
+    const saveBtn = document.getElementById('saveDailyBtn');
+    let updateBtn = document.getElementById('updateDailyBtn');
+    if (!updateBtn) {
+        updateBtn = document.createElement('button');
+        updateBtn.className = 'save-btn btn-secondary';
+        updateBtn.id = 'updateDailyBtn';
+        updateBtn.innerHTML = '<span>🔄</span> Update Today\'s Progress';
+        updateBtn.style.marginLeft = '12px';
+        saveBtn.parentNode.appendChild(updateBtn);
+    }
+    updateBtn.onclick = async function() {
+        await updateDailyData();
+    };
+}
+window.addEventListener('load', setupUpdateDailyButton);
+
+// 1. Live auto-calc calories
+function setupLiveCalorieCalculation() {
+    const proteinInput = document.getElementById('proteinInput');
+    const carbsInput = document.getElementById('carbsInput');
+    const fatsInput = document.getElementById('fatsInput');
+    const caloriesInput = document.getElementById('caloriesInput');
+    function updateCalories() {
+        const calories = autoCalculateCalories();
+        caloriesInput.value = calories;
+        document.getElementById('caloriesValue').textContent = calories;
+        dailyData.calories = calories;
+    }
+    [proteinInput, carbsInput, fatsInput].forEach(input => {
+        input.addEventListener('input', updateCalories);
+    });
+}
+window.addEventListener('load', setupLiveCalorieCalculation);
+
+// 2. Add Update button for daily stats
+function setupUpdateDailyButton() {
+    const saveBtn = document.getElementById('saveDailyBtn');
+    let updateBtn = document.getElementById('updateDailyBtn');
+    if (!updateBtn) {
+        updateBtn = document.createElement('button');
+        updateBtn.className = 'save-btn btn-secondary';
+        updateBtn.id = 'updateDailyBtn';
+        updateBtn.innerHTML = '<span>🔄</span> Update Today\'s Progress';
+        updateBtn.style.marginLeft = '12px';
+        saveBtn.parentNode.appendChild(updateBtn);
+    }
+    updateBtn.onclick = async function() {
+        await origSaveDailyData.apply(this, arguments);
+        showNotification('Daily stats updated!', 'success');
+    };
+}
+window.addEventListener('load', setupUpdateDailyButton);
+
+// 3. Show recommended values and conclusion in logs
+const origRenderHistoryLogs = renderHistoryLogs;
+renderHistoryLogs = function() {
+    const macroTargets = userData && userData.macroTargets ? userData.macroTargets : null;
+    const getRec = (key) => macroTargets ? Math.round(macroTargets[key]) : '-';
+    const getConclusion = (entry) => {
+        let msg = [];
+        if (macroTargets) {
+            if (entry.protein < macroTargets.Protein_g) msg.push('Increase protein');
+            if (entry.carbs > macroTargets.Carb_g) msg.push('Reduce carbs');
+            if (entry.fats > macroTargets.Fat_g) msg.push('Reduce fats');
+            if (entry.calories > macroTargets.Calorie_goal_per_day) msg.push('Reduce calories');
+            if (msg.length === 0) return 'Great job! You hit your targets.';
+            return 'Recommendations: ' + msg.join(', ');
+        }
+        return 'No recommendations (set your macro targets).';
+    };
+    const logList = document.getElementById('historyLogList');
+    logList.innerHTML = '';
+    if (!userData.dailyMetrics) return;
+    const dates = Object.keys(userData.dailyMetrics).sort((a, b) => new Date(b) - new Date(a));
+    let latestWeight = null;
+    for (let i = 0; i < dates.length; i++) {
+        const entry = userData.dailyMetrics[dates[i]];
+        if (entry.weight && !latestWeight) latestWeight = Number(entry.weight);
+    }
+    dates.forEach(date => {
+        const entry = userData.dailyMetrics[date];
+        // Use that day's weight or latestWeight
+        const weight = entry.weight ? Number(entry.weight) : latestWeight;
+        const proteinTarget = getRec('Protein_g');
+        const carbTarget = getRec('Carb_g');
+        const fatTarget = getRec('Fat_g');
+        const calTarget = getRec('Calorie_goal_per_day');
+        const log = document.createElement('div');
+        log.className = 'history-log-item' + (date === selectedDate ? ' active' : '');
+        log.innerHTML = `
+            <div class="history-log-date">${new Date(date).toLocaleDateString()}</div>
+            <div class="history-log-summary">
+                <span>Points: ${entry.points || 0}</span>
+                <span>Weight: ${entry.weight || '-'} (rec: -)</span>
+                <span>Protein: ${entry.protein || 0}g (rec: ${proteinTarget})</span>
+                <span>Carbs: ${entry.carbs || 0}g (rec: ${carbTarget})</span>
+                <span>Fats: ${entry.fats || 0}g (rec: ${fatTarget})</span>
+                <span>Calories: ${entry.calories || 0} (rec: ${calTarget})</span>
+                <span>Training: ${entry.training ? '\u2705' : '\u274c'}</span>
+                <span>Mood: ${entry.mood ? entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1) : '-'}</span>
+            </div>
+            <div class="history-log-conclusion" style="margin-top: 6px; color: #2d7a2d; font-weight: 500;">${getConclusion(entry)}</div>
+        `;
+        log.onclick = () => {
+            selectedDate = date;
+            renderHistoryLogs();
+            showHistoryDetails(date);
+        };
+        logList.appendChild(log);
+    });
 }; 
