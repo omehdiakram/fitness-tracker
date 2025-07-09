@@ -8,6 +8,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const carousel = document.querySelector('.macro-guide-carousel');
+        if (!carousel) return; // Prevent errors if on another page
         const slides = document.querySelectorAll('.carousel-slide');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
@@ -162,6 +163,8 @@
             <button class="nav-tab" onclick="showTab('chat')">Squad Chat</button>
             <button class="nav-tab" onclick="showTab('leaderboard')">Leaderboard</button>
             <button class="nav-tab" onclick="showTab('calculator')">Macros Calculator</button>
+            <!-- ***** NEW BUTTON ADDED ***** -->
+            <button class="nav-tab" onclick="showTab('measurements')">Body Measurements</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -353,15 +356,11 @@
             </div>
         </div>
 
-
-        <!-- ***** 3. NEW CALCULATOR TAB ADDED ***** -->
+        <!-- Macros Calculator Tab -->
         <div id="calculator" class="tab-content">
-            <!-- Macro Calculator Carousel Section -->
             <div class="macro-guide-container">
                 <div class="macro-guide-carousel-wrapper" style="overflow: hidden;">
                     <div class="macro-guide-carousel">
-
-                        <!-- SLIDE 1: PERSONAL DETAILS -->
                         <div class="carousel-slide">
                             <h3>Step 1: Your Personal Details</h3>
                             <p class="slide-subtitle">Let's start with the basics. Please use metric units for accuracy.</p>
@@ -372,8 +371,6 @@
                                 <label>Body Fat (%)<br><input type="number" id="macroBodyFat" min="0" max="60" step="0.1" class="form-input"></label>
                             </div>
                         </div>
-
-                        <!-- SLIDE 2: PROTEIN INTAKE -->
                         <div class="carousel-slide">
                             <h3>Step 2: Protein Intake</h3>
                             <p class="slide-subtitle">Use the sliding scale below to set your protein multiplier based on your body fat %.</p>
@@ -395,8 +392,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- SLIDE 3: ACTIVITY LEVEL -->
                         <div class="carousel-slide">
                             <h3>Step 3: Activity Level</h3>
                             <p class="slide-subtitle">Select a multiplier that reflects your daily activity outside of training.</p>
@@ -421,8 +416,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- SLIDE 4: GOALS & DIETARY FAT -->
                         <div class="carousel-slide">
                             <h3>Step 4: Goals & Dietary Fat</h3>
                             <p class="slide-subtitle">Finally, let's set your fat intake and calorie deficit to match your goals.</p>
@@ -439,12 +432,9 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- SLIDE 5: CALCULATE -->
                         <div class="carousel-slide">
                             <h3>Final Step: Calculate Your Macros</h3>
                             <p class="slide-subtitle">One last check, and you're ready to see your results!</p>
-                            
                             <div class="final-check-box">
                                 <label>
                                     <input type="checkbox" id="macroKatch"> 
@@ -452,18 +442,14 @@
                                 </label>
                                 <p>Check this box for the most accurate BMR calculation based on your Lean Body Mass.</p>
                             </div>
-                            
                             <div class="calculation-area">
                                 <button class="btn btn-calculate" id="macroCalcBtn">Calculate My Macros</button>
                                 <div id="macroCalcResult" class="macro-calc-result"></div>
                                 <button class="btn btn-secondary btn-save" id="macroSaveBtn" style="display:none;">Save Macros to Profile</button>
                             </div>
                         </div>
-
                     </div>
                 </div>
-
-                <!-- CAROUSEL NAVIGATION -->
                 <div class="carousel-navigation">
                     <button class="nav-btn" id="prevBtn" disabled>← Previous</button>
                     <div class="carousel-dots"></div>
@@ -471,7 +457,156 @@
                 </div>
             </div>
         </div>
-        <!-- End New Calculator Tab -->
+        
+<!-- ***** 4. NEW MEASUREMENTS TAB ADDED (AESTHETIC UPDATE) ***** -->
+        <div id="measurements" class="tab-content">
+            <div class="measurements-container">
+                <!-- Left Side: Interactive Body Map -->
+                <div class="measurements-interactive">
+                    <h3 class="card-title futuristic-title"><span>Biometric Scanner</span></h3>
+                    <div class="body-map-container">
+                        <svg class="body-map-svg" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">
+                            <!-- Background Grid -->
+                            <defs>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0, 242, 255, 0.1)" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                            
+                            <!-- MODIFIED: SVG paths for a more muscular and aesthetic body shape -->
+                            <g id="body-parts-group">
+                                <!-- Neck -->
+                                <path id="part-neck" class="body-part" data-target-input="measurement-neck" d="M140,75 L160,75 L165,90 L135,90 Z" />
+                                <!-- Chest -->
+                                <path id="part-chest" class="body-part" data-target-input="measurement-chest" d="M105,92 C 115,95 140,90 150,90 C 160,90 185,95 195,92 L 190,125 C 185,145 150,150 150,150 C 150,150 115,145 110,125 Z" />
+                                <!-- Waist -->
+                                <path id="part-waist" class="body-part" data-target-input="measurement-waist" d="M118,148 L182,148 Q 175,175 150,180 Q 125,175 118,148 Z" />
+                                <!-- Hips -->
+                                <path id="part-hips" class="body-part" data-target-input="measurement-hips" d="M115,180 L185,180 L175,210 L125,210 Z" />
+                                <!-- Right Arm (Bicep) -->
+                                <path id="part-arm-r" class="body-part" data-target-input="measurement-arm-r" d="M202,100 L220,110 Q 225,140 215,150 L200,140 Z" />
+                                <!-- Left Arm (Bicep) -->
+                                <path id="part-arm-l" class="body-part" data-target-input="measurement-arm-l" d="M98,100 L80,110 Q 75,140 85,150 L100,140 Z" />
+                                <!-- Right Thigh (Quad) -->
+                                <path id="part-thigh-r" class="body-part" data-target-input="measurement-thigh-r" d="M175,212 L152,212 L160,290 Q 180,295 190,285 Z" />
+                                <!-- Left Thigh (Quad) -->
+                                <path id="part-thigh-l" class="body-part" data-target-input="measurement-thigh-l" d="M125,212 L148,212 L140,290 Q 120,295 110,285 Z" />
+                                <!-- Right Calf -->
+                                <path id="part-calf-r" class="body-part" data-target-input="measurement-calf-r" d="M162,295 L185,360 L170,365 Q 155,330 162,295 Z" />
+                                <!-- Left Calf -->
+                                <path id="part-calf-l" class="body-part" data-target-input="measurement-calf-l" d="M138,295 L115,360 L130,365 Q 145,330 138,295 Z" />
+                            </g>
+                        </svg>
+                        <!-- MODIFIED: Adjusted label positions for the new body shape -->
+                        <div class="body-map-labels">
+                            <span class="map-label" style="top: 21%; left: 50%;">Neck</span>
+                            <span class="map-label" style="top: 30%; left: 50%;">Chest</span>
+                            <span class="map-label" style="top: 33%; left: 25%;">L Arm</span>
+                            <span class="map-label" style="top: 33%; left: 75%;">R Arm</span>
+                            <span class="map-label" style="top: 41%; left: 50%;">Waist</span>
+                            <span class="map-label" style="top: 50%; left: 50%;">Hips</span>
+                            <span class="map-label" style="top: 65%; left: 35%;">L Thigh</span>
+                            <span class="map-label" style="top: 65%; left: 65%;">R Thigh</span>
+                            <span class="map-label" style="top: 85%; left: 35%;">L Calf</span>
+                            <span class="map-label" style="top: 85%; left: 65%;">R Calf</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Data Input & Progress (No changes here) -->
+                <div class="measurements-data">
+                    <div class="measurements-form card">
+                        <div class="form-header">
+                            <h4 class="form-title">Log Measurements <span class="unit">(cm)</span></h4>
+                            <div id="measurementDate"></div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="input-group"><label for="measurement-neck">Neck</label><input type="number" class="measurement-input" id="measurement-neck" data-target-part="part-neck" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-chest">Chest</label><input type="number" class="measurement-input" id="measurement-chest" data-target-part="part-chest" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-arm-l">Left Arm</label><input type="number" class="measurement-input" id="measurement-arm-l" data-target-part="part-arm-l" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-arm-r">Right Arm</label><input type="number" class="measurement-input" id="measurement-arm-r" data-target-part="part-arm-r" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-waist">Waist</label><input type="number" class="measurement-input" id="measurement-waist" data-target-part="part-waist" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-hips">Hips</label><input type="number" class="measurement-input" id="measurement-hips" data-target-part="part-hips" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-thigh-l">Left Thigh</label><input type="number" class="measurement-input" id="measurement-thigh-l" data-target-part="part-thigh-l" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-thigh-r">Right Thigh</label><input type="number" class="measurement-input" id="measurement-thigh-r" data-target-part="part-thigh-r" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-calf-l">Left Calf</label><input type="number" class="measurement-input" id="measurement-calf-l" data-target-part="part-calf-l" placeholder="--.-" step="0.1"></div>
+                            <div class="input-group"><label for="measurement-calf-r">Right Calf</label><input type="number" class="measurement-input" id="measurement-calf-r" data-target-part="part-calf-r" placeholder="--.-" step="0.1"></div>
+                        </div>
+                        <button class="btn save-measurements-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M7 19V13H17V19H19V11.83C19.0033 11.587 18.9047 11.3534 18.728 11.178L12.353 4.803C12.1583 4.60833 11.8417 4.60833 11.647 4.803L5.272 11.178C5.09533 11.3534 4.99667 11.587 5 11.83V19H7ZM5 21C4.45 21 3.979 20.804 3.587 20.412C3.195 20.02 3 19.55 3 19V11.83C3 11.2333 3.184 10.6957 3.552 10.217L9.927 3.842C10.517 3.252 11.2127 2.957 12 2.957C12.7873 2.957 13.483 3.252 14.073 3.842L20.448 10.217C20.816 10.6957 21 11.2333 21 11.83V19C21 19.55 20.804 20.02 20.412 20.412C20.02 20.804 19.55 21 19 21H5Z"/></svg>
+                            Save Measurements
+                        </button>
+                    </div>
+                    
+                    <div class="measurements-progress card">
+                        <h4 class="progress-title">Overall Development</h4>
+                        <div class="radar-chart-container">
+                            <div class="radar-placeholder">
+                                <svg class="radar-bg" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" stroke="#00f2ff" stroke-opacity="0.2" fill="none"/>
+                                    <circle cx="50" cy="50" r="30" stroke="#00f2ff" stroke-opacity="0.2" fill="none"/>
+                                    <circle cx="50" cy="50" r="15" stroke="#00f2ff" stroke-opacity="0.2" fill="none"/>
+                                </svg>
+                                <p>Your progress radar will appear here after logging data.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+            // Interactivity for the Body Measurements tab
+            document.addEventListener('DOMContentLoaded', () => {
+                const measurementsTab = document.getElementById('measurements');
+                if (!measurementsTab) return;
+
+                const bodyParts = measurementsTab.querySelectorAll('.body-part');
+                const measurementInputs = measurementsTab.querySelectorAll('.measurement-input');
+
+                const setActive = (element) => {
+                    // Clear all active states first
+                    bodyParts.forEach(p => p.classList.remove('active'));
+                    measurementInputs.forEach(i => i.closest('.input-group').classList.remove('active'));
+
+                    if (!element) return;
+
+                    const isBodyPart = element.classList.contains('body-part');
+                    const targetId = isBodyPart ? element.dataset.targetInput : element.dataset.targetPart;
+
+                    const partToActivate = isBodyPart ? element : measurementsTab.querySelector(`#${targetId}`);
+                    const inputToActivate = isBodyPart ? measurementsTab.querySelector(`#${targetId}`) : element;
+
+                    if (partToActivate) partToActivate.classList.add('active');
+                    if (inputToActivate) {
+                        const inputGroup = inputToActivate.closest('.input-group');
+                        if (inputGroup) inputGroup.classList.add('active');
+                        // Focus the input if a body part was clicked
+                        if (isBodyPart) inputToActivate.focus();
+                    }
+                };
+
+                bodyParts.forEach(part => {
+                    part.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        setActive(part);
+                    });
+                });
+
+                measurementInputs.forEach(input => {
+                    input.addEventListener('focus', () => setActive(input));
+                    input.addEventListener('blur', () => setActive(null)); // Optional: clear active state on blur
+                });
+                
+                // Set current date
+                const measurementDateEl = document.getElementById('measurementDate');
+                if(measurementDateEl) {
+                    measurementDateEl.textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                }
+            });
+            </script>
+        </div>
+        <!-- End New Measurements Tab -->
+
 
         <!-- Chat Tab -->
         <div id="chat" class="tab-content">
